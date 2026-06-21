@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NAICO ESG Aerospace Validator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: #f8fafc; }
+    .glass { background: rgba(255,255,255,.86); backdrop-filter: blur(12px); }
+    .print-hide {}
+    @media print { .print-hide { display: none !important; } }
+  </style>
+</head>
+<body class="text-slate-900">
+  <main class="max-w-7xl mx-auto p-4 md:p-8">
+    <section class="mb-8 rounded-3xl bg-gradient-to-r from-emerald-700 to-cyan-700 text-white p-8 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <p class="uppercase tracking-[0.3em] text-emerald-100 text-xs font-bold">NAICO ESG Aerospace Validator 2026</p>
+          <h1 class="text-3xl md:text-5xl font-black mt-3">Aerospace ESG Decision Intelligence Tool</h1>
+          <p class="mt-4 text-emerald-50 max-w-3xl">Self-assessment, emissions logic, segment-weighted ESG readiness, scenario simulation, recommendations, audit history and report export in one embeddable HTML file.</p>
+        </div>
+        <div class="glass text-slate-900 rounded-2xl p-4 min-w-[220px]">
+          <p class="text-xs uppercase font-bold text-slate-500">Current Version</p>
+          <p class="text-2xl font-black">v1.0</p>
+          <p class="text-sm text-slate-600">MITI i-ESG Phase 1 aligned</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-5 gap-6">
+      <form id="assessmentForm" class="lg:col-span-2 bg-white rounded-3xl p-6 shadow border border-slate-200">
+        <h2 class="text-2xl font-black mb-1">Assessment Inputs</h2>
+        <p class="text-sm text-slate-500 mb-6">Enter SME data. Use estimates if exact operational data is unavailable.</p>
+
+        <div class="space-y-5">
+          <div>
+            <label class="text-sm font-bold">Organisation Name</label>
+            <input id="orgName" class="mt-1 w-full rounded-xl border p-3" placeholder="Example: Aero SME Sdn Bhd" value="Demo Aerospace SME" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-sm font-bold">Milestone Year</label>
+              <select id="year" class="mt-1 w-full rounded-xl border p-3">
+                <option>2026</option><option>2030</option><option>2040</option><option>2050</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-bold">Segment</label>
+              <select id="segment" class="mt-1 w-full rounded-xl border p-3">
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="MRO" selected>MRO</option>
+                <option value="SYS Integration">SYS Integration</option>
+                <option value="Engineering / R&T">Engineering / R&T</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
+            <h3 class="font-black text-emerald-900 mb-3">Environment</h3>
+            <label class="text-sm font-bold">Grid Electricity (MWh)</label>
+            <input id="electricity" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="1200" />
+            <label class="text-sm font-bold">Biodiesel / GSE Fuel (tonnes)</label>
+            <input id="biodiesel" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="60" />
+            <label class="text-sm font-bold">Jet A1 Fuel (tonnes)</label>
+            <input id="jetA1" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="80" />
+            <label class="text-sm font-bold">SAF Blend (%)</label>
+            <input id="saf" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="10" />
+            <label class="text-sm font-bold">Hydrogen Feedstock (tonnes)</label>
+            <input id="hydrogen" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="5" />
+            <label class="text-sm font-bold">Solar PV Capacity (kWp)</label>
+            <input id="solar" type="number" class="mt-1 w-full rounded-xl border p-3" value="250" />
+          </div>
+
+          <div class="rounded-2xl bg-cyan-50 border border-cyan-100 p-4">
+            <h3 class="font-black text-cyan-900 mb-3">Social & Governance</h3>
+            <label class="text-sm font-bold">Labour Rights Disclosure (%)</label>
+            <input id="labour" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="70" />
+            <label class="text-sm font-bold">Hiring Readiness (%)</label>
+            <input id="hiring" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="65" />
+            <label class="text-sm font-bold">Institutional ESG Integration (%)</label>
+            <input id="governance" type="number" min="0" max="100" class="mt-1 w-full rounded-xl border p-3" value="55" />
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-xl p-4 shadow">Generate ESG Assessment</button>
+        </div>
+      </form>
+
+      <section class="lg:col-span-3 space-y-6">
+        <div class="grid md:grid-cols-4 gap-4">
+          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Readiness</p><p id="score" class="text-4xl font-black">--</p><p id="maturity" class="font-bold text-emerald-700">Awaiting data</p></div>
+          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Net Emissions</p><p id="emissions" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">tCO₂e</p></div>
+          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Carbon Intensity</p><p id="intensity" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">Gt conversion</p></div>
+          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">MITI Alignment</p><p id="alignment" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">Phase 1 readiness</p></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-3xl p-6 shadow border"><h2 class="text-xl font-black mb-4">ESG Radar</h2><canvas id="radarChart" height="260"></canvas></div>
+          <div class="bg-white rounded-3xl p-6 shadow border"><h2 class="text-xl font-black mb-4">Top Gaps</h2><div id="gaps" class="space-y-3"></div></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow border">
+          <h2 class="text-xl font-black mb-2">Scenario Simulator</h2>
+          <p class="text-sm text-slate-500 mb-4">Test a renewable energy improvement scenario without changing the original assessment.</p>
+          <label class="text-sm font-bold">Solar PV Scenario: <span id="solarScenarioValue">250</span> kWp</label>
+          <input id="solarScenario" type="range" min="0" max="2000" value="250" class="w-full mt-3" />
+          <div class="grid md:grid-cols-3 gap-4 mt-4">
+            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Projected Score</p><p id="projectedScore" class="text-3xl font-black">--</p></div>
+            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Emission Reduction</p><p id="scenarioReduction" class="text-3xl font-black">--</p></div>
+            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Decision Insight</p><p id="decisionInsight" class="font-bold">Run assessment first.</p></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow border">
+          <h2 class="text-xl font-black mb-4">Recommended Transition Roadmap</h2>
+          <div id="recommendations" class="grid md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 shadow border">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <div><h2 class="text-xl font-black">Audit History</h2><p class="text-sm text-slate-500">Stored locally to demonstrate longitudinal assessment capability.</p></div>
+            <div class="flex gap-2 print-hide"><button id="exportPdf" class="rounded-xl bg-slate-900 text-white font-bold px-4 py-3">Export PDF</button><button id="clearHistory" class="rounded-xl bg-slate-100 font-bold px-4 py-3">Clear History</button></div>
+          </div>
+          <div id="history" class="space-y-2"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+<script>
+const weights = {
+  'Manufacturing': { e: 0.60, s: 0.20, g: 0.20 },
+  'MRO': { e: 0.40, s: 0.30, g: 0.30 },
+  'SYS Integration': { e: 0.30, s: 0.30, g: 0.40 },
+  'Engineering / R&T': { e: 0.20, s: 0.40, g: 0.40 }
+};
+let radar, latest;
+const $ = id => document.getElementById(id);
+const n = id => Number($(id).value || 0);
+const clamp = x => Math.max(0, Math.min(100, x));
+
+function calculate(data) {
+  const S2 = data.electricity * 0.6;
+  const S1gse = data.biodiesel * 2.52;
+  const S1flight = data.jetA1 * 3.15 * (1 - ((data.saf / 100) * 0.8));
+  const S1h2 = data.hydrogen * 12.0;
+  const Rsolar = ((data.solar * 1500) / 1000) * 0.6;
+  const net = Math.max(0, S2 + S1gse + S1flight + S1h2 - Rsolar);
+  const env = clamp(100 - (net / 15) + (data.saf * 0.15));
+  const social = clamp((data.labour * 0.55) + (data.hiring * 0.45));
+  const gov = clamp(data.governance);
+  const w = weights[data.segment];
+  const index = clamp((env * w.e) + (social * w.s) + (gov * w.g));
+  return { ...data, S2, S1gse, S1flight, S1h2, Rsolar, net, intensity: net * 1e-9, env, social, gov, index };
+}
+
+function maturity(score) {
+  if (score >= 85) return 'Leader';
+  if (score >= 70) return 'Integrated';
+  if (score >= 55) return 'Managed';
+  if (score >= 40) return 'Developing';
+  return 'Aware';
+}
+function alignment(score) {
+  if (score >= 80) return 'High';
+  if (score >= 60) return 'Medium';
+  return 'Low';
+}
+function getGaps(r) {
+  const arr = [
+    { name: 'Environment', score: r.env, detail: 'Reduce Scope 1/2 emissions and increase renewable adoption.' },
+    { name: 'Social', score: r.social, detail: 'Improve labour disclosure and hiring readiness.' },
+    { name: 'Governance', score: r.gov, detail: 'Formalise ESG ownership, policies and board-level integration.' }
+  ];
+  return arr.sort((a,b)=>a.score-b.score);
+}
+function getRecommendations(r) {
+  const gaps = getGaps(r);
+  return gaps.map((g, i) => {
+    const actions = {
+      Environment: 'Increase solar PV capacity, raise SAF blend where relevant, and prioritise high-emission equipment replacement.',
+      Social: 'Publish labour rights disclosure, document workforce training, and improve hiring readiness for ESG-related roles.',
+      Governance: 'Create ESG committee ownership, establish policy controls, and document MITI i-ESG alignment evidence.'
+    };
+    return { title: `${i+1}. ${g.name} Upgrade`, impact: g.score < 50 ? 'High impact' : 'Medium impact', action: actions[g.name] };
+  });
+}
+function collect() {
+  return {
+    orgName: $('orgName').value || 'Unnamed Organisation', year: $('year').value, segment: $('segment').value,
+    electricity: n('electricity'), biodiesel: n('biodiesel'), jetA1: n('jetA1'), saf: n('saf'), hydrogen: n('hydrogen'), solar: n('solar'),
+    labour: n('labour'), hiring: n('hiring'), governance: n('governance')
+  };
+}
+function render(r) {
+  latest = r;
+  $('score').textContent = Math.round(r.index);
+  $('maturity').textContent = maturity(r.index);
+  $('emissions').textContent = r.net.toFixed(1);
+  $('intensity').textContent = r.intensity.toExponential(2);
+  $('alignment').textContent = alignment(r.index);
+  $('solarScenario').value = r.solar;
+  $('solarScenarioValue').textContent = r.solar;
+  updateRadar(r);
+  $('gaps').innerHTML = getGaps(r).map(g => `<div class="rounded-2xl bg-slate-50 p-4"><div class="flex justify-between"><b>${g.name}</b><span class="font-black">${Math.round(g.score)}/100</span></div><p class="text-sm text-slate-600 mt-1">${g.detail}</p><div class="mt-3 h-2 bg-slate-200 rounded-full"><div class="h-2 bg-emerald-600 rounded-full" style="width:${g.score}%"></div></div></div>`).join('');
+  $('recommendations').innerHTML = getRecommendations(r).map(x => `<div class="rounded-2xl border bg-gradient-to-b from-white to-slate-50 p-4"><p class="text-xs uppercase font-bold text-emerald-700">${x.impact}</p><h3 class="font-black mt-1">${x.title}</h3><p class="text-sm text-slate-600 mt-2">${x.action}</p></div>`).join('');
+  updateScenario();
+}
+function updateRadar(r) {
+  const ctx = $('radarChart');
+  if (radar) radar.destroy();
+  radar = new Chart(ctx, { type: 'radar', data: { labels: ['Environment','Social','Governance'], datasets: [{ label: 'ESG Pillar Score', data: [r.env, r.social, r.gov], fill: true }] }, options: { scales: { r: { suggestedMin: 0, suggestedMax: 100 } }, plugins: { legend: { display: false } } } });
+}
+function saveHistory(r) {
+  const history = JSON.parse(localStorage.getItem('esg-history') || '[]');
+  history.unshift({ date: new Date().toLocaleString(), orgName: r.orgName, segment: r.segment, score: Math.round(r.index), net: Number(r.net.toFixed(1)), maturity: maturity(r.index) });
+  localStorage.setItem('esg-history', JSON.stringify(history.slice(0,8)));
+  renderHistory();
+}
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('esg-history') || '[]');
+  $('history').innerHTML = history.length ? history.map(h => `<div class="flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl bg-slate-50 p-4"><div><b>${h.orgName}</b><p class="text-sm text-slate-500">${h.date} • ${h.segment}</p></div><div class="font-black">Score ${h.score} • ${h.maturity} • ${h.net} tCO₂e</div></div>`).join('') : '<p class="text-slate-500">No assessments saved yet.</p>';
+}
+function updateScenario() {
+  if (!latest) return;
+  const solar = Number($('solarScenario').value);
+  $('solarScenarioValue').textContent = solar;
+  const projected = calculate({ ...latest, solar });
+  $('projectedScore').textContent = Math.round(projected.index);
+  const reduction = latest.net - projected.net;
+  $('scenarioReduction').textContent = `${reduction.toFixed(1)} tCO₂e`;
+  $('decisionInsight').textContent = reduction > 50 ? 'Strong renewable impact.' : reduction > 0 ? 'Moderate improvement.' : 'No reduction from this scenario.';
+}
+
+$('assessmentForm').addEventListener('submit', e => { e.preventDefault(); const r = calculate(collect()); render(r); saveHistory(r); });
+$('solarScenario').addEventListener('input', updateScenario);
+$('clearHistory').addEventListener('click', () => { localStorage.removeItem('esg-history'); renderHistory(); });
+$('exportPdf').addEventListener('click', () => {
+  if (!latest) return alert('Generate assessment first.');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(18); doc.text('NAICO ESG Aerospace Validator Report', 14, 18);
+  doc.setFontSize(11);
+  const lines = [
+    `Organisation: ${latest.orgName}`, `Segment: ${latest.segment}`, `Milestone Year: ${latest.year}`,
+    `Readiness Index: ${Math.round(latest.index)} / 100 (${maturity(latest.index)})`,
+    `Net Emissions: ${latest.net.toFixed(2)} tCO2e`, `Carbon Intensity: ${latest.intensity.toExponential(3)} Gt`,
+    `Environment: ${Math.round(latest.env)} | Social: ${Math.round(latest.social)} | Governance: ${Math.round(latest.gov)}`,
+    '', 'Technical Formula:', 'E_net = (S2 + S1gse + S1flight + S1h2) - Rsolar',
+    'Index = (E_score*We) + (S_score*Ws) + (G_score*Wg)', '', 'Recommended Actions:',
+    ...getRecommendations(latest).map(x => `- ${x.title}: ${x.action}`)
+  ];
+  doc.text(lines, 14, 32, { maxWidth: 180 });
+  doc.save('naico-esg-validator-report.pdf');
+});
+renderHistory();
+render(calculate(collect()));
+</script>
+</body>
+</html>
