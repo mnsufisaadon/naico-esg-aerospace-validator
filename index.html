@@ -3,55 +3,356 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NAICO ESG Aerospace Validator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>NAICO ESG Aerospace Validator 2026</title>
+  <meta name="description" content="Single-file aerospace ESG decision intelligence validator with emissions calculation, segment-weighted scoring, scenario simulation, recommendations, audit history, and printable report." />
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #102033;
+      --muted: #627084;
+      --line: #dfe7ef;
+      --primary: #047857;
+      --primary-dark: #065f46;
+      --primary-soft: #dcfce7;
+      --cyan: #0891b2;
+      --cyan-soft: #cffafe;
+      --amber: #f59e0b;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --slate-soft: #f1f5f9;
+      --shadow: 0 18px 55px rgba(15, 23, 42, .09);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { background: #f8fafc; }
-    .glass { background: rgba(255,255,255,.86); backdrop-filter: blur(12px); }
-    .print-hide {}
-    @media print { .print-hide { display: none !important; } }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(4,120,87,.14), transparent 28rem),
+        radial-gradient(circle at top right, rgba(8,145,178,.13), transparent 25rem),
+        var(--bg);
+      line-height: 1.5;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .container { width: min(1240px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 44px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 32px;
+      padding: 34px;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(6,95,70,.96), rgba(8,145,178,.94)),
+        radial-gradient(circle at top right, rgba(255,255,255,.25), transparent 20rem);
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -160px;
+      top: -190px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.13);
+    }
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 26px;
+      align-items: end;
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      font-size: 12px;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: rgba(255,255,255,.82);
+    }
+    h1 { margin: 0; font-size: clamp(34px, 5vw, 62px); line-height: .95; letter-spacing: -0.05em; }
+    .hero p.lead { max-width: 780px; margin: 18px 0 0; color: rgba(255,255,255,.9); font-size: 17px; }
+    .version-card {
+      border: 1px solid rgba(255,255,255,.38);
+      background: rgba(255,255,255,.88);
+      color: var(--text);
+      border-radius: 22px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+    }
+    .version-card small { display: block; color: var(--muted); font-weight: 900; text-transform: uppercase; font-size: 11px; letter-spacing: .08em; }
+    .version-card strong { display: block; font-size: 28px; margin-top: 3px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,.34);
+      background: rgba(255,255,255,.13);
+      color: white;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 22px;
+      margin-top: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 22px; }
+    .sticky { position: sticky; top: 16px; }
+    .section-title { margin: 0; font-size: 22px; letter-spacing: -0.025em; line-height: 1.15; }
+    .section-desc { margin: 6px 0 18px; color: var(--muted); font-size: 14px; }
+
+    .field-group {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+    .field-group.env { background: linear-gradient(180deg, #f0fdf4, #ffffff); border-color: #bbf7d0; }
+    .field-group.sg { background: linear-gradient(180deg, #ecfeff, #ffffff); border-color: #a5f3fc; }
+    .group-heading { margin: 0 0 12px; font-size: 15px; font-weight: 950; letter-spacing: -.01em; color: var(--primary-dark); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 900; color: #253247; }
+    input, select {
+      width: 100%;
+      border: 1px solid #cfd8e3;
+      border-radius: 14px;
+      padding: 12px 13px;
+      background: white;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(4,120,87,.12); }
+    input[type="range"] { padding: 0; accent-color: var(--primary); }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .btn {
+      border: 0;
+      border-radius: 15px;
+      padding: 12px 15px;
+      font-weight: 950;
+      transition: transform .15s, box-shadow .15s, background .15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 12px 26px rgba(4,120,87,.22); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-dark { background: #0f172a; color: white; }
+    .btn-soft { background: var(--slate-soft); color: var(--text); border: 1px solid var(--line); }
+    .btn-cyan { background: var(--cyan); color: white; }
+    .full { width: 100%; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .kpi {
+      padding: 18px;
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kpi .label { margin: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-size: 11px; font-weight: 950; }
+    .kpi .value { margin: 10px 0 0; font-size: clamp(28px, 3vw, 42px); line-height: .9; letter-spacing: -.06em; font-weight: 1000; }
+    .kpi .sub { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .status {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 950;
+      margin-top: 10px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    .status.warn { background: var(--amber-soft); color: #92400e; }
+    .status.bad { background: var(--red-soft); color: #991b1b; }
+
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .span-2 { grid-column: span 2; }
+    .svg-wrap { min-height: 320px; display: grid; place-items: center; }
+    #radarSvg { width: 100%; max-width: 360px; height: auto; overflow: visible; }
+    .axis-label { fill: #334155; font-size: 12px; font-weight: 900; }
+    .axis-line { stroke: #cbd5e1; stroke-width: 1; }
+    .grid-line { fill: none; stroke: #e2e8f0; stroke-width: 1; }
+    .radar-poly { fill: rgba(4, 120, 87, .26); stroke: #047857; stroke-width: 3; }
+    .radar-dot { fill: #047857; stroke: white; stroke-width: 3; }
+
+    .gap-list, .roadmap, .history-list, .formula-list { display: grid; gap: 10px; }
+    .gap-item, .roadmap-item, .history-item, .formula-item {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .bar { height: 9px; background: #dbe4ee; overflow: hidden; border-radius: 999px; margin-top: 10px; }
+    .bar > span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--cyan)); transition: width .4s ease; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 950;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+    .pill.medium { background: var(--amber-soft); color: #92400e; }
+    .pill.low { background: var(--red-soft); color: #991b1b; }
+
+    .summary-card {
+      background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+      border-color: #99f6e4;
+    }
+    .summary-text { font-size: 16px; color: #1e3a3a; margin: 0; }
+    .method-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+    .formula { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; color: #334155; overflow-wrap: anywhere; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; overflow: hidden; border-radius: 16px; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px; }
+    th { background: #f1f5f9; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+    tr:last-child td { border-bottom: 0; }
+
+    .scenario-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .scenario-controls { display: grid; gap: 13px; }
+    .scenario-result {
+      border-radius: 20px;
+      border: 1px solid #99f6e4;
+      background: linear-gradient(135deg, #ecfeff, #f0fdf4);
+      padding: 16px;
+    }
+    .scenario-number { font-size: 38px; letter-spacing: -.06em; font-weight: 1000; margin: 4px 0 0; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .strong { font-weight: 950; }
+    .footer-note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 24px; }
+
+    .print-only { display: none; }
+
+    @media (max-width: 1024px) {
+      .hero-grid, .layout, .method-grid, .scenario-panel { grid-template-columns: 1fr; }
+      .sticky { position: static; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .container { width: min(100% - 18px, 1240px); padding-top: 9px; }
+      .hero { padding: 24px 18px; border-radius: 24px; }
+      h1 { font-size: 34px; }
+      .hero p.lead { font-size: 14px; }
+      .card-pad { padding: 16px; }
+      .grid-2, .content-grid, .kpi-grid { grid-template-columns: 1fr; }
+      .span-2 { grid-column: auto; }
+      .btn-row .btn { width: 100%; }
+      .kpi { min-height: auto; }
+    }
+
+    @media print {
+      body { background: white; }
+      .container { width: 100%; padding: 0; }
+      .hero, .card { box-shadow: none; }
+      .print-hide, .inputs-panel, .btn-row, .footer-note { display: none !important; }
+      .print-only { display: block; }
+      .layout, .content-grid, .method-grid, .scenario-panel { display: block; }
+      .card { break-inside: avoid; margin-bottom: 14px; }
+      .hero { color: #0f172a; background: white; border: 1px solid #cbd5e1; }
+      .chip { color: #0f172a; border-color: #cbd5e1; background: #f8fafc; }
+    }
   </style>
 </head>
-<body class="text-slate-900">
-  <main class="max-w-7xl mx-auto p-4 md:p-8">
-    <section class="mb-8 rounded-3xl bg-gradient-to-r from-emerald-700 to-cyan-700 text-white p-8 shadow-xl">
-      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-grid">
         <div>
-          <p class="uppercase tracking-[0.3em] text-emerald-100 text-xs font-bold">NAICO ESG Aerospace Validator 2026</p>
-          <h1 class="text-3xl md:text-5xl font-black mt-3">Aerospace ESG Decision Intelligence Tool</h1>
-          <p class="mt-4 text-emerald-50 max-w-3xl">Self-assessment, emissions logic, segment-weighted ESG readiness, scenario simulation, recommendations, audit history and report export in one embeddable HTML file.</p>
+          <p class="eyebrow">NAICO ESG Aerospace Validator 2026</p>
+          <h1>Aerospace ESG Decision Intelligence Tool</h1>
+          <p class="lead">
+            A single-file HTML/CSS/JS validator for Google Sites: emissions quantification, segment-weighted ESG readiness,
+            scenario simulation, transition recommendations, audit history, and printable report output.
+          </p>
+          <div class="chips" aria-label="Framework alignment">
+            <span class="chip">MITI i-ESG Phase 1</span>
+            <span class="chip">NIMP2030</span>
+            <span class="chip">NETR</span>
+            <span class="chip">GHG Protocol</span>
+            <span class="chip">ISO 14064</span>
+          </div>
         </div>
-        <div class="glass text-slate-900 rounded-2xl p-4 min-w-[220px]">
-          <p class="text-xs uppercase font-bold text-slate-500">Current Version</p>
-          <p class="text-2xl font-black">v1.0</p>
-          <p class="text-sm text-slate-600">MITI i-ESG Phase 1 aligned</p>
+        <div class="version-card">
+          <small>Current Version</small>
+          <strong>v2.0</strong>
+          <p class="small muted" style="margin:8px 0 0;">No framework dependency. Mobile-ready, GitHub Pages-ready, and embeddable in Google Sites.</p>
         </div>
       </div>
     </section>
 
-    <section class="grid lg:grid-cols-5 gap-6">
-      <form id="assessmentForm" class="lg:col-span-2 bg-white rounded-3xl p-6 shadow border border-slate-200">
-        <h2 class="text-2xl font-black mb-1">Assessment Inputs</h2>
-        <p class="text-sm text-slate-500 mb-6">Enter SME data. Use estimates if exact operational data is unavailable.</p>
+    <section class="layout">
+      <aside class="inputs-panel card card-pad sticky">
+        <form id="assessmentForm">
+          <h2 class="section-title">Assessment Inputs</h2>
+          <p class="section-desc">Enter SME operating data. For demo purposes, estimates are acceptable, but real submissions should document assumptions in the logbook.</p>
 
-        <div class="space-y-5">
-          <div>
-            <label class="text-sm font-bold">Organisation Name</label>
-            <input id="orgName" class="mt-1 w-full rounded-xl border p-3" placeholder="Example: Aero SME Sdn Bhd" value="Demo Aerospace SME" />
+          <div class="form-row">
+            <label for="orgName">Organisation Name</label>
+            <input id="orgName" value="Demo Aerospace SME" placeholder="Example: Aero SME Sdn Bhd" />
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-sm font-bold">Milestone Year</label>
-              <select id="year" class="mt-1 w-full rounded-xl border p-3">
-                <option>2026</option><option>2030</option><option>2040</option><option>2050</option>
+
+          <div class="grid-2">
+            <div class="form-row">
+              <label for="year">Milestone Year</label>
+              <select id="year">
+                <option>2026</option>
+                <option>2030</option>
+                <option>2040</option>
+                <option>2050</option>
               </select>
             </div>
-            <div>
-              <label class="text-sm font-bold">Segment</label>
-              <select id="segment" class="mt-1 w-full rounded-xl border p-3">
+            <div class="form-row">
+              <label for="segment">Aerospace Segment</label>
+              <select id="segment">
                 <option value="Manufacturing">Manufacturing</option>
                 <option value="MRO" selected>MRO</option>
                 <option value="SYS Integration">SYS Integration</option>
@@ -60,205 +361,654 @@
             </div>
           </div>
 
-          <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
-            <h3 class="font-black text-emerald-900 mb-3">Environment</h3>
-            <label class="text-sm font-bold">Grid Electricity (MWh)</label>
-            <input id="electricity" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="1200" />
-            <label class="text-sm font-bold">Biodiesel / GSE Fuel (tonnes)</label>
-            <input id="biodiesel" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="60" />
-            <label class="text-sm font-bold">Jet A1 Fuel (tonnes)</label>
-            <input id="jetA1" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="80" />
-            <label class="text-sm font-bold">SAF Blend (%)</label>
-            <input id="saf" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="10" />
-            <label class="text-sm font-bold">Hydrogen Feedstock (tonnes)</label>
-            <input id="hydrogen" type="number" class="mt-1 mb-3 w-full rounded-xl border p-3" value="5" />
-            <label class="text-sm font-bold">Solar PV Capacity (kWp)</label>
-            <input id="solar" type="number" class="mt-1 w-full rounded-xl border p-3" value="250" />
+          <div class="field-group env">
+            <h3 class="group-heading">Environment & Emissions</h3>
+            <div class="form-row">
+              <label for="electricity">Grid Electricity Consumption (MWh)</label>
+              <input id="electricity" type="number" min="0" step="1" value="1200" />
+            </div>
+            <div class="grid-2">
+              <div class="form-row">
+                <label for="biodiesel">GSE / Biodiesel Fuel (tonnes)</label>
+                <input id="biodiesel" type="number" min="0" step="1" value="60" />
+              </div>
+              <div class="form-row">
+                <label for="jetA1">Jet A1 Fuel (tonnes)</label>
+                <input id="jetA1" type="number" min="0" step="1" value="80" />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-row">
+                <label for="saf">SAF Blend (%)</label>
+                <input id="saf" type="number" min="0" max="100" step="1" value="10" />
+              </div>
+              <div class="form-row">
+                <label for="hydrogen">Hydrogen Feedstock (tonnes)</label>
+                <input id="hydrogen" type="number" min="0" step="1" value="5" />
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <label for="solar">Solar PV Capacity (kWp)</label>
+              <input id="solar" type="number" min="0" step="1" value="250" />
+            </div>
           </div>
 
-          <div class="rounded-2xl bg-cyan-50 border border-cyan-100 p-4">
-            <h3 class="font-black text-cyan-900 mb-3">Social & Governance</h3>
-            <label class="text-sm font-bold">Labour Rights Disclosure (%)</label>
-            <input id="labour" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="70" />
-            <label class="text-sm font-bold">Hiring Readiness (%)</label>
-            <input id="hiring" type="number" min="0" max="100" class="mt-1 mb-3 w-full rounded-xl border p-3" value="65" />
-            <label class="text-sm font-bold">Institutional ESG Integration (%)</label>
-            <input id="governance" type="number" min="0" max="100" class="mt-1 w-full rounded-xl border p-3" value="55" />
+          <div class="field-group sg">
+            <h3 class="group-heading">Social & Governance</h3>
+            <div class="form-row">
+              <label for="labour">Labour Rights Disclosure (%)</label>
+              <input id="labour" type="number" min="0" max="100" step="1" value="70" />
+            </div>
+            <div class="form-row">
+              <label for="hiring">Hiring / Workforce Readiness (%)</label>
+              <input id="hiring" type="number" min="0" max="100" step="1" value="65" />
+            </div>
+            <div class="form-row" style="margin-bottom:0;">
+              <label for="governance">Institutional ESG Integration (%)</label>
+              <input id="governance" type="number" min="0" max="100" step="1" value="55" />
+            </div>
           </div>
 
-          <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-xl p-4 shadow">Generate ESG Assessment</button>
-        </div>
-      </form>
-
-      <section class="lg:col-span-3 space-y-6">
-        <div class="grid md:grid-cols-4 gap-4">
-          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Readiness</p><p id="score" class="text-4xl font-black">--</p><p id="maturity" class="font-bold text-emerald-700">Awaiting data</p></div>
-          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Net Emissions</p><p id="emissions" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">tCO₂e</p></div>
-          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">Carbon Intensity</p><p id="intensity" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">Gt conversion</p></div>
-          <div class="bg-white rounded-3xl p-5 shadow border"><p class="text-xs uppercase font-bold text-slate-500">MITI Alignment</p><p id="alignment" class="text-3xl font-black">--</p><p class="text-sm text-slate-500">Phase 1 readiness</p></div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="bg-white rounded-3xl p-6 shadow border"><h2 class="text-xl font-black mb-4">ESG Radar</h2><canvas id="radarChart" height="260"></canvas></div>
-          <div class="bg-white rounded-3xl p-6 shadow border"><h2 class="text-xl font-black mb-4">Top Gaps</h2><div id="gaps" class="space-y-3"></div></div>
-        </div>
-
-        <div class="bg-white rounded-3xl p-6 shadow border">
-          <h2 class="text-xl font-black mb-2">Scenario Simulator</h2>
-          <p class="text-sm text-slate-500 mb-4">Test a renewable energy improvement scenario without changing the original assessment.</p>
-          <label class="text-sm font-bold">Solar PV Scenario: <span id="solarScenarioValue">250</span> kWp</label>
-          <input id="solarScenario" type="range" min="0" max="2000" value="250" class="w-full mt-3" />
-          <div class="grid md:grid-cols-3 gap-4 mt-4">
-            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Projected Score</p><p id="projectedScore" class="text-3xl font-black">--</p></div>
-            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Emission Reduction</p><p id="scenarioReduction" class="text-3xl font-black">--</p></div>
-            <div class="rounded-2xl bg-slate-50 p-4"><p class="text-xs uppercase font-bold text-slate-500">Decision Insight</p><p id="decisionInsight" class="font-bold">Run assessment first.</p></div>
+          <div class="btn-row">
+            <button class="btn btn-primary full" type="submit">Generate ESG Assessment</button>
+            <button class="btn btn-soft full" type="button" id="resetDemo">Reset Demo Data</button>
           </div>
-        </div>
+        </form>
+      </aside>
 
-        <div class="bg-white rounded-3xl p-6 shadow border">
-          <h2 class="text-xl font-black mb-4">Recommended Transition Roadmap</h2>
-          <div id="recommendations" class="grid md:grid-cols-3 gap-4"></div>
-        </div>
-
-        <div class="bg-white rounded-3xl p-6 shadow border">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <div><h2 class="text-xl font-black">Audit History</h2><p class="text-sm text-slate-500">Stored locally to demonstrate longitudinal assessment capability.</p></div>
-            <div class="flex gap-2 print-hide"><button id="exportPdf" class="rounded-xl bg-slate-900 text-white font-bold px-4 py-3">Export PDF</button><button id="clearHistory" class="rounded-xl bg-slate-100 font-bold px-4 py-3">Clear History</button></div>
+      <section>
+        <section class="kpi-grid" aria-label="Assessment results">
+          <div class="card kpi">
+            <p class="label">Readiness Index</p>
+            <div>
+              <p id="score" class="value">--</p>
+              <span id="maturity" class="status">Awaiting data</span>
+            </div>
           </div>
-          <div id="history" class="space-y-2"></div>
-        </div>
+          <div class="card kpi">
+            <p class="label">Net Emissions</p>
+            <div>
+              <p id="emissions" class="value">--</p>
+              <p class="sub">tCO₂e after solar offset</p>
+            </div>
+          </div>
+          <div class="card kpi">
+            <p class="label">Carbon Intensity</p>
+            <div>
+              <p id="intensity" class="value">--</p>
+              <p class="sub">Gigatonne conversion</p>
+            </div>
+          </div>
+          <div class="card kpi">
+            <p class="label">MITI Alignment</p>
+            <div>
+              <p id="alignment" class="value">--</p>
+              <p class="sub">Phase 1 readiness signal</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card card-pad summary-card">
+          <div class="row-between">
+            <div>
+              <h2 class="section-title">Executive Intelligence Summary</h2>
+              <p class="section-desc" style="margin-bottom:0;">Judge-friendly interpretation generated from deterministic scoring logic.</p>
+            </div>
+            <button class="btn btn-cyan print-hide" id="copySummary" type="button">Copy Summary</button>
+          </div>
+          <p id="summaryText" class="summary-text" style="margin-top:14px;">Generate an assessment to produce the executive summary.</p>
+        </section>
+
+        <section class="content-grid" style="margin-top:18px;">
+          <div class="card card-pad">
+            <h2 class="section-title">ESG Radar</h2>
+            <p class="section-desc">Pillar score comparison after applying aerospace segment weighting.</p>
+            <div class="svg-wrap">
+              <svg id="radarSvg" viewBox="0 0 360 330" role="img" aria-label="ESG radar chart"></svg>
+            </div>
+          </div>
+
+          <div class="card card-pad">
+            <h2 class="section-title">Top Gaps</h2>
+            <p class="section-desc">Lowest scoring areas are converted into practical improvement priorities.</p>
+            <div id="gaps" class="gap-list"></div>
+          </div>
+
+          <div class="card card-pad span-2">
+            <h2 class="section-title">Scenario Simulator</h2>
+            <p class="section-desc">Test a transition pathway without changing the saved baseline assessment.</p>
+            <div class="scenario-panel">
+              <div class="scenario-controls">
+                <div>
+                  <label for="solarScenario">Solar PV Scenario: <span id="solarScenarioValue">250</span> kWp</label>
+                  <input id="solarScenario" type="range" min="0" max="2000" step="10" value="250" />
+                </div>
+                <div>
+                  <label for="safScenario">SAF Blend Scenario: <span id="safScenarioValue">10</span>%</label>
+                  <input id="safScenario" type="range" min="0" max="100" step="1" value="10" />
+                </div>
+                <div>
+                  <label for="governanceScenario">Governance Scenario: <span id="governanceScenarioValue">55</span>%</label>
+                  <input id="governanceScenario" type="range" min="0" max="100" step="1" value="55" />
+                </div>
+              </div>
+
+              <div class="scenario-result">
+                <p class="muted small strong" style="margin:0;">Projected Readiness</p>
+                <p id="projectedScore" class="scenario-number">--</p>
+                <p id="scenarioReduction" class="strong" style="margin:0;">Run assessment first.</p>
+                <div class="bar"><span id="scenarioBar"></span></div>
+                <p id="decisionInsight" class="small" style="margin:12px 0 0;">Decision insight will appear here.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-pad span-2">
+            <h2 class="section-title">Recommended Transition Roadmap</h2>
+            <p class="section-desc">Prioritised 0–24 month action plan based on the weakest ESG dimensions.</p>
+            <div id="recommendations" class="roadmap"></div>
+          </div>
+
+          <div class="card card-pad span-2">
+            <div class="row-between">
+              <div>
+                <h2 class="section-title">Audit History</h2>
+                <p class="section-desc" style="margin-bottom:0;">Stored in browser localStorage to demonstrate longitudinal assessment capability.</p>
+              </div>
+              <div class="btn-row print-hide" style="margin:0;">
+                <button class="btn btn-dark" id="printReport" type="button">Print / Save PDF</button>
+                <button class="btn btn-soft" id="downloadJson" type="button">Download JSON</button>
+                <button class="btn btn-soft" id="clearHistory" type="button">Clear History</button>
+              </div>
+            </div>
+            <div id="history" class="history-list" style="margin-top:14px;"></div>
+          </div>
+
+          <div class="card card-pad span-2">
+            <h2 class="section-title">Technical Methodology & Audit Logic</h2>
+            <p class="section-desc">Visible logic helps judges understand and audit the mathematical approach.</p>
+            <div class="method-grid">
+              <div class="formula-list">
+                <div class="formula-item">
+                  <div class="strong">Total Net Emissions</div>
+                  <div class="formula">E_net = (S₂ + S₁gse + S₁flight + S₁h2) − R_solar</div>
+                </div>
+                <div class="formula-item">
+                  <div class="strong">Scope 2 Electricity</div>
+                  <div class="formula">S₂ = Electricity(MWh) × 0.6 tCO₂e/MWh</div>
+                </div>
+                <div class="formula-item">
+                  <div class="strong">Ground Support Equipment</div>
+                  <div class="formula">S₁gse = Biodiesel(t) × 2.52 tCO₂e/t</div>
+                </div>
+                <div class="formula-item">
+                  <div class="strong">Flight Fuel with SAF Reduction</div>
+                  <div class="formula">S₁flight = JetA1(t) × 3.15 × (1 − (SAF% × 0.8))</div>
+                </div>
+                <div class="formula-item">
+                  <div class="strong">Solar Offset</div>
+                  <div class="formula">R_solar = (kWp × 1500 / 1000) × 0.6 tCO₂e</div>
+                </div>
+              </div>
+
+              <div>
+                <table aria-label="Segment weighting table">
+                  <thead>
+                    <tr>
+                      <th>Segment</th>
+                      <th>Env</th>
+                      <th>Social</th>
+                      <th>Gov</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Manufacturing</td><td>0.60</td><td>0.20</td><td>0.20</td></tr>
+                    <tr><td>MRO</td><td>0.40</td><td>0.30</td><td>0.30</td></tr>
+                    <tr><td>SYS Integration</td><td>0.30</td><td>0.30</td><td>0.40</td></tr>
+                    <tr><td>Engineering / R&amp;T</td><td>0.20</td><td>0.40</td><td>0.40</td></tr>
+                  </tbody>
+                </table>
+                <div class="formula-item" style="margin-top:12px;">
+                  <div class="strong">Segment-Weighted Index</div>
+                  <div class="formula">Index = (E_score × W_e) + (S_score × W_s) + (G_score × W_g)</div>
+                </div>
+                <p class="small muted" style="margin-top:12px;">
+                  Note: Readiness normalisation is a prototype decision-support layer. Coefficients and thresholds should be recorded in the technical logbook and refined after SME validation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </section>
+
+    <p class="footer-note">
+      Built as a single-file HTML/CSS/JS prototype for Google Sites embedding and GitHub Pages hosting.
+    </p>
   </main>
 
 <script>
-const weights = {
-  'Manufacturing': { e: 0.60, s: 0.20, g: 0.20 },
-  'MRO': { e: 0.40, s: 0.30, g: 0.30 },
-  'SYS Integration': { e: 0.30, s: 0.30, g: 0.40 },
-  'Engineering / R&T': { e: 0.20, s: 0.40, g: 0.40 }
-};
-let radar, latest;
-const $ = id => document.getElementById(id);
-const n = id => Number($(id).value || 0);
-const clamp = x => Math.max(0, Math.min(100, x));
+(function () {
+  "use strict";
 
-function calculate(data) {
-  const S2 = data.electricity * 0.6;
-  const S1gse = data.biodiesel * 2.52;
-  const S1flight = data.jetA1 * 3.15 * (1 - ((data.saf / 100) * 0.8));
-  const S1h2 = data.hydrogen * 12.0;
-  const Rsolar = ((data.solar * 1500) / 1000) * 0.6;
-  const net = Math.max(0, S2 + S1gse + S1flight + S1h2 - Rsolar);
-  const env = clamp(100 - (net / 15) + (data.saf * 0.15));
-  const social = clamp((data.labour * 0.55) + (data.hiring * 0.45));
-  const gov = clamp(data.governance);
-  const w = weights[data.segment];
-  const index = clamp((env * w.e) + (social * w.s) + (gov * w.g));
-  return { ...data, S2, S1gse, S1flight, S1h2, Rsolar, net, intensity: net * 1e-9, env, social, gov, index };
-}
-
-function maturity(score) {
-  if (score >= 85) return 'Leader';
-  if (score >= 70) return 'Integrated';
-  if (score >= 55) return 'Managed';
-  if (score >= 40) return 'Developing';
-  return 'Aware';
-}
-function alignment(score) {
-  if (score >= 80) return 'High';
-  if (score >= 60) return 'Medium';
-  return 'Low';
-}
-function getGaps(r) {
-  const arr = [
-    { name: 'Environment', score: r.env, detail: 'Reduce Scope 1/2 emissions and increase renewable adoption.' },
-    { name: 'Social', score: r.social, detail: 'Improve labour disclosure and hiring readiness.' },
-    { name: 'Governance', score: r.gov, detail: 'Formalise ESG ownership, policies and board-level integration.' }
-  ];
-  return arr.sort((a,b)=>a.score-b.score);
-}
-function getRecommendations(r) {
-  const gaps = getGaps(r);
-  return gaps.map((g, i) => {
-    const actions = {
-      Environment: 'Increase solar PV capacity, raise SAF blend where relevant, and prioritise high-emission equipment replacement.',
-      Social: 'Publish labour rights disclosure, document workforce training, and improve hiring readiness for ESG-related roles.',
-      Governance: 'Create ESG committee ownership, establish policy controls, and document MITI i-ESG alignment evidence.'
-    };
-    return { title: `${i+1}. ${g.name} Upgrade`, impact: g.score < 50 ? 'High impact' : 'Medium impact', action: actions[g.name] };
-  });
-}
-function collect() {
-  return {
-    orgName: $('orgName').value || 'Unnamed Organisation', year: $('year').value, segment: $('segment').value,
-    electricity: n('electricity'), biodiesel: n('biodiesel'), jetA1: n('jetA1'), saf: n('saf'), hydrogen: n('hydrogen'), solar: n('solar'),
-    labour: n('labour'), hiring: n('hiring'), governance: n('governance')
+  const defaultData = {
+    orgName: "Demo Aerospace SME",
+    year: "2026",
+    segment: "MRO",
+    electricity: 1200,
+    biodiesel: 60,
+    jetA1: 80,
+    saf: 10,
+    hydrogen: 5,
+    solar: 250,
+    labour: 70,
+    hiring: 65,
+    governance: 55
   };
-}
-function render(r) {
-  latest = r;
-  $('score').textContent = Math.round(r.index);
-  $('maturity').textContent = maturity(r.index);
-  $('emissions').textContent = r.net.toFixed(1);
-  $('intensity').textContent = r.intensity.toExponential(2);
-  $('alignment').textContent = alignment(r.index);
-  $('solarScenario').value = r.solar;
-  $('solarScenarioValue').textContent = r.solar;
-  updateRadar(r);
-  $('gaps').innerHTML = getGaps(r).map(g => `<div class="rounded-2xl bg-slate-50 p-4"><div class="flex justify-between"><b>${g.name}</b><span class="font-black">${Math.round(g.score)}/100</span></div><p class="text-sm text-slate-600 mt-1">${g.detail}</p><div class="mt-3 h-2 bg-slate-200 rounded-full"><div class="h-2 bg-emerald-600 rounded-full" style="width:${g.score}%"></div></div></div>`).join('');
-  $('recommendations').innerHTML = getRecommendations(r).map(x => `<div class="rounded-2xl border bg-gradient-to-b from-white to-slate-50 p-4"><p class="text-xs uppercase font-bold text-emerald-700">${x.impact}</p><h3 class="font-black mt-1">${x.title}</h3><p class="text-sm text-slate-600 mt-2">${x.action}</p></div>`).join('');
-  updateScenario();
-}
-function updateRadar(r) {
-  const ctx = $('radarChart');
-  if (radar) radar.destroy();
-  radar = new Chart(ctx, { type: 'radar', data: { labels: ['Environment','Social','Governance'], datasets: [{ label: 'ESG Pillar Score', data: [r.env, r.social, r.gov], fill: true }] }, options: { scales: { r: { suggestedMin: 0, suggestedMax: 100 } }, plugins: { legend: { display: false } } } });
-}
-function saveHistory(r) {
-  const history = JSON.parse(localStorage.getItem('esg-history') || '[]');
-  history.unshift({ date: new Date().toLocaleString(), orgName: r.orgName, segment: r.segment, score: Math.round(r.index), net: Number(r.net.toFixed(1)), maturity: maturity(r.index) });
-  localStorage.setItem('esg-history', JSON.stringify(history.slice(0,8)));
-  renderHistory();
-}
-function renderHistory() {
-  const history = JSON.parse(localStorage.getItem('esg-history') || '[]');
-  $('history').innerHTML = history.length ? history.map(h => `<div class="flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl bg-slate-50 p-4"><div><b>${h.orgName}</b><p class="text-sm text-slate-500">${h.date} • ${h.segment}</p></div><div class="font-black">Score ${h.score} • ${h.maturity} • ${h.net} tCO₂e</div></div>`).join('') : '<p class="text-slate-500">No assessments saved yet.</p>';
-}
-function updateScenario() {
-  if (!latest) return;
-  const solar = Number($('solarScenario').value);
-  $('solarScenarioValue').textContent = solar;
-  const projected = calculate({ ...latest, solar });
-  $('projectedScore').textContent = Math.round(projected.index);
-  const reduction = latest.net - projected.net;
-  $('scenarioReduction').textContent = `${reduction.toFixed(1)} tCO₂e`;
-  $('decisionInsight').textContent = reduction > 50 ? 'Strong renewable impact.' : reduction > 0 ? 'Moderate improvement.' : 'No reduction from this scenario.';
-}
 
-$('assessmentForm').addEventListener('submit', e => { e.preventDefault(); const r = calculate(collect()); render(r); saveHistory(r); });
-$('solarScenario').addEventListener('input', updateScenario);
-$('clearHistory').addEventListener('click', () => { localStorage.removeItem('esg-history'); renderHistory(); });
-$('exportPdf').addEventListener('click', () => {
-  if (!latest) return alert('Generate assessment first.');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(18); doc.text('NAICO ESG Aerospace Validator Report', 14, 18);
-  doc.setFontSize(11);
-  const lines = [
-    `Organisation: ${latest.orgName}`, `Segment: ${latest.segment}`, `Milestone Year: ${latest.year}`,
-    `Readiness Index: ${Math.round(latest.index)} / 100 (${maturity(latest.index)})`,
-    `Net Emissions: ${latest.net.toFixed(2)} tCO2e`, `Carbon Intensity: ${latest.intensity.toExponential(3)} Gt`,
-    `Environment: ${Math.round(latest.env)} | Social: ${Math.round(latest.social)} | Governance: ${Math.round(latest.gov)}`,
-    '', 'Technical Formula:', 'E_net = (S2 + S1gse + S1flight + S1h2) - Rsolar',
-    'Index = (E_score*We) + (S_score*Ws) + (G_score*Wg)', '', 'Recommended Actions:',
-    ...getRecommendations(latest).map(x => `- ${x.title}: ${x.action}`)
-  ];
-  doc.text(lines, 14, 32, { maxWidth: 180 });
-  doc.save('naico-esg-validator-report.pdf');
-});
-renderHistory();
-render(calculate(collect()));
+  const weights = {
+    "Manufacturing": { e: 0.60, s: 0.20, g: 0.20, threshold: 2200 },
+    "MRO": { e: 0.40, s: 0.30, g: 0.30, threshold: 1400 },
+    "SYS Integration": { e: 0.30, s: 0.30, g: 0.40, threshold: 1000 },
+    "Engineering / R&T": { e: 0.20, s: 0.40, g: 0.40, threshold: 800 }
+  };
+
+  let latest = null;
+
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => Number($(id).value || 0);
+  const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+  const fmt = (value, digits = 1) => Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits });
+  const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+
+  function collect() {
+    return {
+      orgName: $("orgName").value.trim() || "Unnamed Organisation",
+      year: $("year").value,
+      segment: $("segment").value,
+      electricity: Math.max(0, num("electricity")),
+      biodiesel: Math.max(0, num("biodiesel")),
+      jetA1: Math.max(0, num("jetA1")),
+      saf: clamp(num("saf")),
+      hydrogen: Math.max(0, num("hydrogen")),
+      solar: Math.max(0, num("solar")),
+      labour: clamp(num("labour")),
+      hiring: clamp(num("hiring")),
+      governance: clamp(num("governance"))
+    };
+  }
+
+  function calculate(data) {
+    const segment = weights[data.segment] ? data.segment : "MRO";
+    const w = weights[segment];
+
+    const S2 = data.electricity * 0.6;
+    const S1gse = data.biodiesel * 2.52;
+    const S1flight = data.jetA1 * 3.15 * (1 - ((data.saf / 100) * 0.8));
+    const S1h2 = data.hydrogen * 12.0;
+    const Rsolar = ((data.solar * 1500) / 1000) * 0.6;
+    const gross = Math.max(0, S2 + S1gse + S1flight + S1h2);
+    const net = Math.max(0, gross - Rsolar);
+    const intensity = net * 1e-9;
+
+    const emissionsScore = clamp(100 - ((net / w.threshold) * 100));
+    const renewableScore = clamp((Rsolar / Math.max(gross, 1)) * 400);
+    const safScore = clamp((data.saf / 30) * 100);
+    const env = clamp((emissionsScore * 0.60) + (renewableScore * 0.25) + (safScore * 0.15));
+
+    const social = clamp((data.labour * 0.55) + (data.hiring * 0.45));
+    const gov = clamp(data.governance);
+    const index = clamp((env * w.e) + (social * w.s) + (gov * w.g));
+
+    return {
+      ...data,
+      segment,
+      S2,
+      S1gse,
+      S1flight,
+      S1h2,
+      Rsolar,
+      gross,
+      net,
+      intensity,
+      emissionsScore,
+      renewableScore,
+      safScore,
+      env,
+      social,
+      gov,
+      index
+    };
+  }
+
+  function maturity(score) {
+    if (score >= 85) return { label: "Leader", tone: "good" };
+    if (score >= 70) return { label: "Integrated", tone: "good" };
+    if (score >= 55) return { label: "Managed", tone: "warn" };
+    if (score >= 40) return { label: "Developing", tone: "warn" };
+    return { label: "Aware", tone: "bad" };
+  }
+
+  function alignment(score) {
+    if (score >= 80) return { label: "High", tone: "good" };
+    if (score >= 60) return { label: "Medium", tone: "warn" };
+    return { label: "Low", tone: "bad" };
+  }
+
+  function getGaps(result) {
+    return [
+      {
+        key: "Environment",
+        score: result.env,
+        detail: "Reduce Scope 1/2 emissions, increase renewable energy, and document SAF or offset logic.",
+        action: "Increase solar PV, review GSE fuel usage, and set a near-term emissions-reduction target."
+      },
+      {
+        key: "Social",
+        score: result.social,
+        detail: "Improve labour rights disclosure, workforce readiness, and evidence of behaviour-change activities.",
+        action: "Publish labour practices, training records, and ESG workforce readiness evidence."
+      },
+      {
+        key: "Governance",
+        score: result.gov,
+        detail: "Formalise ESG responsibility, policy ownership, board/management review, and audit trails.",
+        action: "Create an ESG owner, policy register, monthly review cadence, and logic iteration logbook."
+      }
+    ].sort((a, b) => a.score - b.score);
+  }
+
+  function getRoadmap(result) {
+    const gaps = getGaps(result);
+    const first = gaps[0].key;
+    const second = gaps[1].key;
+    const third = gaps[2].key;
+
+    return [
+      {
+        period: "0–3 Months",
+        title: `${first} Stabilisation`,
+        impact: gaps[0].score < 50 ? "High impact" : "Medium impact",
+        action: gaps[0].action
+      },
+      {
+        period: "3–12 Months",
+        title: `${second} Integration`,
+        impact: gaps[1].score < 60 ? "High impact" : "Medium impact",
+        action: gaps[1].action
+      },
+      {
+        period: "12–24 Months",
+        title: `${third} Leadership Pathway`,
+        impact: "Strategic impact",
+        action: gaps[2].action
+      }
+    ];
+  }
+
+  function buildSummary(result) {
+    const mat = maturity(result.index).label;
+    const align = alignment(result.index).label.toLowerCase();
+    const gap = getGaps(result)[0];
+    const score = Math.round(result.index);
+    return `${escapeHTML(result.orgName)} is assessed as ${mat} with a readiness index of ${score}/100 for the ${escapeHTML(result.segment)} segment. Net emissions are ${fmt(result.net, 1)} tCO₂e after solar offset, with ${align} MITI i-ESG Phase 1 alignment. The strongest immediate improvement area is ${gap.key}: ${gap.action}`;
+  }
+
+  function render(result) {
+    latest = result;
+    const mat = maturity(result.index);
+    const align = alignment(result.index);
+
+    $("score").textContent = Math.round(result.index);
+    $("maturity").textContent = mat.label;
+    $("maturity").className = "status " + (mat.tone === "bad" ? "bad" : mat.tone === "warn" ? "warn" : "");
+    $("emissions").textContent = fmt(result.net, 1);
+    $("intensity").textContent = result.intensity.toExponential(2);
+    $("alignment").textContent = align.label;
+
+    $("summaryText").innerHTML = buildSummary(result);
+
+    renderRadar(result);
+    renderGaps(result);
+    renderRoadmap(result);
+    syncScenarioControls(result);
+    renderScenario();
+  }
+
+  function renderRadar(result) {
+    const svg = $("radarSvg");
+    const scores = [
+      { label: "Environment", value: result.env },
+      { label: "Social", value: result.social },
+      { label: "Governance", value: result.gov }
+    ];
+    const cx = 180;
+    const cy = 160;
+    const maxR = 105;
+    const angleOffset = -Math.PI / 2;
+
+    function point(index, value) {
+      const angle = angleOffset + (index * 2 * Math.PI / scores.length);
+      const radius = maxR * (value / 100);
+      return {
+        x: cx + Math.cos(angle) * radius,
+        y: cy + Math.sin(angle) * radius
+      };
+    }
+
+    function gridPoint(index, pct) {
+      const angle = angleOffset + (index * 2 * Math.PI / scores.length);
+      const radius = maxR * pct;
+      return `${cx + Math.cos(angle) * radius},${cy + Math.sin(angle) * radius}`;
+    }
+
+    const grids = [0.25, 0.5, 0.75, 1].map((pct) => {
+      const pts = scores.map((_, i) => gridPoint(i, pct)).join(" ");
+      return `<polygon class="grid-line" points="${pts}"></polygon>`;
+    }).join("");
+
+    const axes = scores.map((_, i) => {
+      const outer = point(i, 100);
+      return `<line class="axis-line" x1="${cx}" y1="${cy}" x2="${outer.x}" y2="${outer.y}"></line>`;
+    }).join("");
+
+    const polyPoints = scores.map((item, i) => {
+      const p = point(i, item.value);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+
+    const dots = scores.map((item, i) => {
+      const p = point(i, item.value);
+      return `<circle class="radar-dot" cx="${p.x}" cy="${p.y}" r="6"></circle>`;
+    }).join("");
+
+    const labels = scores.map((item, i) => {
+      const p = point(i, 122);
+      const anchor = i === 0 ? "middle" : i === 1 ? "start" : "end";
+      return `<text class="axis-label" x="${p.x}" y="${p.y}" text-anchor="${anchor}">${item.label} ${Math.round(item.value)}</text>`;
+    }).join("");
+
+    svg.innerHTML = `${grids}${axes}<polygon class="radar-poly" points="${polyPoints}"></polygon>${dots}${labels}`;
+  }
+
+  function renderGaps(result) {
+    $("gaps").innerHTML = getGaps(result).map((gap, index) => {
+      const score = Math.round(gap.score);
+      const tone = score >= 70 ? "" : score >= 50 ? "medium" : "low";
+      return `
+        <div class="gap-item">
+          <div class="row-between">
+            <strong>${index + 1}. ${gap.key}</strong>
+            <span class="pill ${tone}">${score}/100</span>
+          </div>
+          <p class="small muted" style="margin:8px 0 0;">${gap.detail}</p>
+          <div class="bar"><span style="width:${score}%"></span></div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderRoadmap(result) {
+    $("recommendations").innerHTML = getRoadmap(result).map((item) => `
+      <div class="roadmap-item">
+        <div class="row-between">
+          <strong>${item.period}: ${item.title}</strong>
+          <span class="pill">${item.impact}</span>
+        </div>
+        <p class="small muted" style="margin:8px 0 0;">${item.action}</p>
+      </div>
+    `).join("");
+  }
+
+  function syncScenarioControls(result) {
+    $("solarScenario").value = Math.min(2000, Math.round(result.solar));
+    $("safScenario").value = Math.round(result.saf);
+    $("governanceScenario").value = Math.round(result.governance);
+  }
+
+  function renderScenario() {
+    if (!latest) return;
+
+    const solar = Number($("solarScenario").value);
+    const saf = Number($("safScenario").value);
+    const governance = Number($("governanceScenario").value);
+
+    $("solarScenarioValue").textContent = solar;
+    $("safScenarioValue").textContent = saf;
+    $("governanceScenarioValue").textContent = governance;
+
+    const projected = calculate({ ...latest, solar, saf, governance });
+    const scoreDelta = projected.index - latest.index;
+    const emissionReduction = latest.net - projected.net;
+    const reductionPct = latest.net > 0 ? (emissionReduction / latest.net) * 100 : 0;
+
+    $("projectedScore").textContent = `${Math.round(projected.index)} / 100`;
+    $("scenarioReduction").textContent = `${scoreDelta >= 0 ? "+" : ""}${scoreDelta.toFixed(1)} score points • ${emissionReduction >= 0 ? "−" : "+"}${Math.abs(emissionReduction).toFixed(1)} tCO₂e`;
+    $("scenarioBar").style.width = `${Math.round(projected.index)}%`;
+
+    let insight = "This scenario provides limited movement. Prioritise the lowest scoring ESG pillar first.";
+    if (scoreDelta >= 10 || reductionPct >= 20) {
+      insight = "Strong transition case: this scenario materially improves readiness and reduces the emissions gap.";
+    } else if (scoreDelta >= 4 || reductionPct >= 8) {
+      insight = "Moderate transition case: useful improvement, especially when combined with governance and disclosure evidence.";
+    } else if (scoreDelta < 0) {
+      insight = "Scenario weakens the baseline. Keep the current controls or select a higher-impact pathway.";
+    }
+    $("decisionInsight").textContent = insight;
+  }
+
+  function saveHistory(result) {
+    const history = readHistory();
+    history.unshift({
+      date: new Date().toLocaleString(),
+      orgName: result.orgName,
+      year: result.year,
+      segment: result.segment,
+      score: Math.round(result.index),
+      maturity: maturity(result.index).label,
+      net: Number(result.net.toFixed(1)),
+      env: Math.round(result.env),
+      social: Math.round(result.social),
+      gov: Math.round(result.gov)
+    });
+    localStorage.setItem("naico-esg-history-v2", JSON.stringify(history.slice(0, 10)));
+    renderHistory();
+  }
+
+  function readHistory() {
+    try {
+      return JSON.parse(localStorage.getItem("naico-esg-history-v2") || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function renderHistory() {
+    const history = readHistory();
+    $("history").innerHTML = history.length ? history.map((entry) => `
+      <div class="history-item">
+        <div class="row-between">
+          <div>
+            <strong>${escapeHTML(entry.orgName)}</strong>
+            <p class="small muted" style="margin:3px 0 0;">${entry.date} • ${escapeHTML(entry.segment)} • ${entry.year}</p>
+          </div>
+          <div class="strong">Score ${entry.score} • ${entry.maturity} • ${entry.net} tCO₂e</div>
+        </div>
+      </div>
+    `).join("") : `<p class="muted">No assessments saved yet. Click “Generate ESG Assessment” to create an audit record.</p>`;
+  }
+
+  function resetDemoData() {
+    Object.entries(defaultData).forEach(([key, value]) => {
+      if ($(key)) $(key).value = value;
+    });
+    const result = calculate(collect());
+    render(result);
+  }
+
+  function downloadJson() {
+    if (!latest) {
+      alert("Generate assessment first.");
+      return;
+    }
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      assessment: latest,
+      maturity: maturity(latest.index).label,
+      alignment: alignment(latest.index).label,
+      topGaps: getGaps(latest),
+      roadmap: getRoadmap(latest)
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "naico-esg-validator-assessment.json";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  $("assessmentForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    const result = calculate(collect());
+    render(result);
+    saveHistory(result);
+    document.querySelector(".kpi-grid").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  ["solarScenario", "safScenario", "governanceScenario"].forEach((id) => {
+    $(id).addEventListener("input", renderScenario);
+  });
+
+  $("resetDemo").addEventListener("click", resetDemoData);
+  $("clearHistory").addEventListener("click", function () {
+    if (confirm("Clear local audit history?")) {
+      localStorage.removeItem("naico-esg-history-v2");
+      renderHistory();
+    }
+  });
+  $("printReport").addEventListener("click", function () {
+    if (!latest) {
+      alert("Generate assessment first.");
+      return;
+    }
+    window.print();
+  });
+  $("downloadJson").addEventListener("click", downloadJson);
+  $("copySummary").addEventListener("click", async function () {
+    const summary = $("summaryText").innerText;
+    try {
+      await navigator.clipboard.writeText(summary);
+      $("copySummary").textContent = "Copied";
+      setTimeout(() => $("copySummary").textContent = "Copy Summary", 1200);
+    } catch (error) {
+      alert(summary);
+    }
+  });
+
+  renderHistory();
+  render(calculate(collect()));
+})();
 </script>
 </body>
 </html>
