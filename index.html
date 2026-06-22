@@ -2026,6 +2026,32 @@ function refreshAssessment() {
   updateFlightSection();
   render(calculate(collect()));
 }
+function isEmbedded() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+function exportPdf() {
+  window.print();
+}
+
+function setupExportButton() {
+  const btn = $("heroPrint");
+  if (!btn) return;
+
+  if (isEmbedded()) {
+    btn.textContent = "Open Full App to Export PDF";
+    btn.onclick = () => {
+      alertMsg("Open the standalone GitHub Pages version to export PDF.");
+    };
+  } else {
+    btn.textContent = "Export PDF";
+    btn.onclick = exportPdf;
+  }
+}
 $('seg').addEventListener('change', () => {
   updateFlightSection({ resetConditional: true });
   render(calculate(collect()));
@@ -2061,10 +2087,7 @@ if ($('clearHistory')) $('clearHistory').addEventListener('click', () => {
   renderHistory();
   alertMsg('Current SME audit history cleared.');
 });
-if ($('heroPrint')) $('heroPrint').addEventListener('click', () => {
-  alertMsg('For the cleanest PDF: enable Background graphics and turn off browser Headers and footers in the print dialog.');
-  setTimeout(() => window.print(), 250);
-});
+setupExportButton();
 if ($('btnAiInsights')) $('btnAiInsights').addEventListener('click', generateAiInsights);
 if ($('btnCopyAi')) $('btnCopyAi').addEventListener('click', copyAiSummary);
 document.addEventListener('click', (event) => {
