@@ -44,16 +44,16 @@
     .hero {
       position: relative;
       overflow: hidden;
-      border-radius: 22px;
+      border-radius: 24px;
       color: #fff;
-      background: linear-gradient(115deg, var(--primary-deep) 0%, var(--primary-dark) 55%, var(--primary) 100%);
+      background: linear-gradient(115deg, var(--primary-deep) 0%, var(--primary-dark) 52%, var(--primary) 100%);
       box-shadow: var(--shadow);
-      min-height: 118px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 18px;
-      padding: 24px 28px;
+      min-height: 192px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      padding: 30px;
+      align-items: end;
     }
     .hero::before,
     .hero::after {
@@ -70,7 +70,7 @@
     .hero::after { right: 6%; background: rgba(255,255,255,.08); }
     .hero > * { position: relative; z-index: 1; }
     .eyebrow { letter-spacing: .24em; text-transform: uppercase; font-size: 11px; font-weight: 900; opacity: .85; }
-    h1 { margin: 8px 0 0; font-size: clamp(26px, 3vw, 42px); line-height: 1; letter-spacing: -.04em; }
+    h1 { margin: 10px 0 0; font-size: clamp(30px, 4vw, 56px); line-height: .96; letter-spacing: -.04em; }
     .hero p { margin: 14px 0 0; max-width: 820px; color: rgba(255,255,255,.84); line-height: 1.55; }
     .hero-card {
       background: rgba(255,255,255,.92);
@@ -81,7 +81,7 @@
       backdrop-filter: blur(12px);
     }
     .hero-card .version { font-size: 30px; font-weight: 950; color: var(--primary-deep); }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 
     .btn {
       border: 0;
@@ -460,21 +460,6 @@
       border-radius: 14px;
       background: #fff;
     }
-
-    .ai-full { margin-top: 22px; }
-    .ai-layout {
-      display: grid;
-      grid-template-columns: 360px minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-    .ai-full .ai-output {
-      margin-top: 0;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .ai-full .ai-section { grid-column: 1 / -1; }
     .validation-compact { display: grid; gap: 10px; }
     .validation-row {
       display: grid;
@@ -489,26 +474,6 @@
     .validation-row strong { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark); }
     .validation-row span { color: var(--primary); font-weight: 950; white-space: nowrap; }
 
-
-    .ai-evidence {
-      margin-top: 12px;
-      display: grid;
-      gap: 7px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .ai-evidence span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #fff;
-      font-weight: 800;
-    }
-    .ai-evidence b { color: var(--primary-dark); }
-
     @media (max-width: 1250px) {
       .main-grid { grid-template-columns: 330px minmax(0, 1fr); }
       .right-column { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -521,7 +486,7 @@
     @media (max-width: 900px) {
       .shell { width: min(100% - 22px, 720px); padding-top: 12px; }
       .hero { grid-template-columns: 1fr; padding: 22px; }
-      .main-grid, .bottom-grid, .right-column, .audit-method, .explain-grid, .scenario-grid, .scenario-output, .ai-layout, .ai-full .ai-output { grid-template-columns: 1fr; }
+      .main-grid, .bottom-grid, .right-column, .audit-method, .explain-grid, .scenario-grid, .scenario-output { grid-template-columns: 1fr; }
       .form-grid-2, .kpi-grid { grid-template-columns: 1fr 1fr; }
       .matrix-row, .stack-row { grid-template-columns: 1fr; }
       .mj-grid { grid-template-columns: 1fr 1fr; }
@@ -540,18 +505,13 @@
       h1 { font-size: 34px; }
     }
 
-    @page { size: A4; margin: 10mm; }
     @media print {
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       body { background: #fff; }
       .shell { width: 100%; padding: 0; }
       .hero, .panel { box-shadow: none; }
-      .print-hide, .hero-actions, button, .info-dot, .alert, .ai-config { display: none !important; }
+      .print-hide, .hero-actions, button { display: none !important; }
       .main-grid, .bottom-grid, .right-column, .audit-method { display: block; }
       .panel { margin-bottom: 14px; break-inside: avoid; }
-      .kpi-value, .vv-value, .validation-row span { white-space: nowrap !important; }
-      .ai-section, .validation-row, .breakdown-row, .chart-box, .kpi { break-inside: avoid; }
-      input, select { border-color: #D8E6EC; background: #fff; }
     }
   </style>
 </head>
@@ -561,9 +521,20 @@
       <div>
         <div class="eyebrow">NAICO ESG Aerospace Validator 2026</div>
         <h1>Aerospace ESG Decision Intelligence Platform</h1>
+        <p>A single-file validator for aerospace SME readiness: emissions quantification, Gt and MJ logic, SBTi milestone comparison, segment-specific weighting, policy mapping, AI-generated ESG insights, recommendations and audit-ready reporting.</p>
+        <div class="hero-actions print-hide">
+          <button class="btn btn-primary" id="heroGenerate">Generate Report</button>
+          <button class="btn btn-ghost" id="heroPrint">Print / Save PDF</button>
+          <button class="btn btn-ghost" id="heroJson">Export JSON</button>
+        </div>
       </div>
-      <div class="hero-actions print-hide">
-        <button class="btn btn-ghost" id="heroPrint" type="button">Export PDF</button>
+      <div class="hero-card">
+        <div class="eyebrow" style="color:#557382; letter-spacing:.12em;">Current Version</div>
+        <div class="version">v2.3</div>
+        <p style="margin:6px 0 0;color:#475569;font-size:13px;">Aligned to MITI i-ESG Phase 1, SBTi milestones, GHG Protocol / ISO 14064 and IPCC energy logic.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+          <span class="tag">Single HTML</span><span class="tag">Audit-ready</span><span class="tag">#0086A9</span>
+        </div>
       </div>
     </header>
 
@@ -691,7 +662,7 @@
           </div>
            <div class="benchmark-summary">
                 <div class="kpi mini-kpi"><div class="kpi-label">Readiness Index <span class="info-dot" id="tipKpiIndex" tabindex="0" data-tip="Formula loading...">i</span></div><div class="kpi-row"><div id="resTotal" class="kpi-value">--</div><span id="maturityPill" class="tag">--</span></div></div>
-              <div class="kpi mini-kpi"><div class="kpi-label">Carbon Delta (Gt) <span class="info-dot" id="tipKpiGt" tabindex="0" data-tip="Formula loading...">i</span></div><div id="resGt" class="kpi-value">--</div></div>
+              <div class="kpi mini-kpi"><div class="kpi-label">Carbon Delta <span class="info-dot" id="tipKpiGt" tabindex="0" data-tip="Formula loading...">i</span></div><div id="resGt" class="kpi-value">--</div></div>
             </div>
           <div class="benchmark-card-top">
             <div class="chart-box radar-card">
@@ -720,45 +691,43 @@
 
       <aside class="stack right-column">
         <section class="panel">
-          <div class="panel-head"><div><h2 class="panel-title">Technical Validation</h2><p class="panel-sub">Compact audit defence for emissions, energy, SBTi milestone alignment and segment-specific ESG weighting.</p></div></div>
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">AI ESG Advisor</h2>
+              <p class="panel-sub">Turns the calculated assessment into executive insights, gaps and an action roadmap.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="ai-card">
+              <strong style="color:var(--primary-dark);">Aerospace ESG Intelligence</strong>
+              <p class="panel-sub" style="margin-top:6px;">Generate concise, judge-ready guidance based on the current score, emissions, SBTi gap, E/S/G pillars and policy tags.</p>
+              <div class="ai-actions print-hide">
+                <button class="btn btn-primary btn-full" id="btnAiInsights" type="button">✨ Generate AI Insights</button>
+                <button class="btn btn-outline btn-full" id="btnCopyAi" type="button">Copy Executive Summary</button>
+              </div>
+              <div class="ai-status" id="aiStatus">Static fallback is available. Connect a Vercel/Netlify API endpoint for live ChatGPT analysis.</div>
+              <div class="ai-config print-hide">
+                <label>AI API Endpoint <span class="info-dot" tabindex="0" data-tip="Do not place your OpenAI API key inside index.html. Deploy a small serverless endpoint on Vercel/Netlify, then paste its URL here. If empty, the page uses a local preview generator.">i</span></label>
+                <input id="aiEndpoint" placeholder="https://your-domain.vercel.app/api/esg-advisor" />
+              </div>
+            </div>
+            <div class="ai-output" id="aiOutput">
+              <div class="ai-section"><h3>AI insights not generated yet</h3><p>Generate the assessment first, then click “Generate AI Insights”.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2 class="panel-title">Technical Validation</h2><p class="panel-sub">Compact audit defence: Gt, MJ, SBTi and segment weighting.</p></div></div>
           <div class="panel-body"><div class="validation-compact" id="vvMetrics"></div></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2 class="panel-title">Recommended Transition Roadmap</h2><p class="panel-sub">Decision intelligence generated from the weakest metrics.</p></div></div>
+          <div class="panel-body"><div id="recommendations" class="recommendation-list"></div></div>
         </section>
       </aside>
     </main>
-
-    <section class="panel ai-full">
-      <div class="panel-head">
-        <div>
-          <h2 class="panel-title">AI Aerospace ESG Advisor</h2>
-          <p class="panel-sub">AI-generated executive intelligence: summary, gaps, transition roadmap, policy alignment and strategic interpretation.</p>
-        </div>
-      </div>
-      <div class="panel-body">
-        <div class="ai-layout">
-          <div class="ai-card">
-            <strong style="color:var(--primary-dark);">Aerospace ESG Intelligence</strong>
-            <p class="panel-sub" style="margin-top:6px;">Generate concise guidance using deterministic calculation outputs as the source of truth. AI interprets; it does not recalculate.</p>
-            <div class="ai-actions print-hide">
-              <button class="btn btn-primary btn-full" id="btnAiInsights" type="button">✨ Generate AI Insights</button>
-              <button class="btn btn-outline btn-full" id="btnCopyAi" type="button">Copy Executive Summary</button>
-            </div>
-            <div class="ai-status" id="aiStatus">AI precision mode is enabled. Local preview is available; connect a Vercel/Netlify endpoint for live ChatGPT analysis.</div>
-            <div class="ai-evidence" id="aiEvidence">
-              <span>Source of truth: <b>Deterministic formulas</b></span>
-              <span>AI role: <b>Interpretation only</b></span>
-              <span>SBTi rule: <b>Positive delta = ahead</b></span>
-            </div>
-            <div class="ai-config print-hide">
-              <label>AI API Endpoint <span class="info-dot" tabindex="0" data-tip="Do not place your OpenAI API key inside index.html. Deploy a small serverless endpoint on Vercel/Netlify, then paste its URL here. If empty, the page uses a local preview generator.">i</span></label>
-              <input id="aiEndpoint" placeholder="https://your-domain.vercel.app/api/esg-advisor" />
-            </div>
-          </div>
-          <div class="ai-output" id="aiOutput">
-            <div class="ai-section"><h3>AI insights not generated yet</h3><p>Generate the assessment first, then click “Generate AI Insights”.</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <div class="footer-note">Disclaimer: This validator is a decision-support tool for challenge demonstration. Results are based on user inputs and do not constitute official certification.</div>
   </div>
@@ -815,21 +784,12 @@ function maturity(score) {
   if (score > 50) return 'Silver';
   return 'Bronze';
 }
-function isFlightSegment(segment) {
-  return segment === 'MFG' || segment === 'SYS';
-}
 function collect(overrides = {}) {
-  const segment = $('seg').value;
-  const flightEnabled = isFlightSegment(segment);
   const base = {
     orgName: $('orgName').value || 'Unnamed Organisation',
     targetYear: $('targetYear').value,
-    segment,
-    // Guardrail: hidden conditional inputs must not affect calculation.
-    // Jet-A1 and SAF are only valid for Aero-Manufacturing and System Integration.
-    fuel: flightEnabled ? num('fuel') : 0,
-    saf: flightEnabled ? num('saf') : 0,
-    elec: num('elec'), bio: num('biodiesel'), solar: num('solar'), h2: num('h2'),
+    segment: $('seg').value,
+    fuel: num('fuel'), elec: num('elec'), bio: num('biodiesel'), solar: num('solar'), h2: num('h2'), saf: num('saf'),
     inst: num('instInt'), hiring: num('hiringReady'), labour: num('labour'), offsetPct: num('offsetPct'), batt: num('batt')
   };
   return { ...base, ...overrides };
@@ -872,7 +832,7 @@ function render(r, save = false) {
   $('safVal').textContent = `${Math.round(r.saf)}%`;
   $('labVal').textContent = `${Math.round(r.labour)}%`;
   $('resTotal').textContent = r.totalScore;
-  $('resGt').textContent = r.intensityGt.toExponential(2);
+  $('resGt').innerHTML = formatGtHTML(r.intensityGt, 2);
 //   $('resGtNote').textContent = `${fmtMaybe(r.netEmissions, 1)} tCO2e × 10⁻⁹`;
 //   $('resGap').textContent = `${r.gap >= 0 ? '+' : ''}${r.gap.toFixed(1)}%`;
 //   $('resEnergyRatio').textContent = `${Math.round(r.energyRatio)}%`;
@@ -883,8 +843,10 @@ function render(r, save = false) {
   renderScoreExplain(r);
   renderTrend(r);
   renderVVMetrics(r);
+  renderRecommendations(r);
   updateTooltips(r);
-  updateAiEvidence(r);
+  syncScenarioFromResult(r);
+  updateScenario();
   if (save) saveHistory(r);
 }
 function renderRadar(r) {
@@ -942,7 +904,7 @@ function renderScoreExplain(r) {
         <div class="breakdown-title">${row.name} <span class="info-dot" tabindex="0" data-tip="${row.tip}">i</span></div>
         <div class="bar-track"><div class="bar-fill" style="width:${clamp(row.score)}%"></div></div>
       </div>
-      <div class="breakdown-value">${Math.round(row.score)}%<small>${(row.score * row.weight).toFixed(1)} pts</small></div>
+      <div class="breakdown-value">${Math.round(row.weight*100)}%</div>
     </div>`).join('');
 }
 function renderTrend(r) {
@@ -964,22 +926,21 @@ function escapeAttr(text) {
     .replace(/>/g, '&gt;');
 }
 function renderVVMetrics(r) {
-  const sbtiLabel = r.gap >= 0 ? `+${r.gap.toFixed(1)}% Ahead` : `${r.gap.toFixed(1)}% Behind`;
   const metrics = [
     {
       name: 'Gt Carbon Logic',
       value: `${formatGtText(r.intensityGt, 2)} Gt`,
-      tip: `Formula:\nIntensityGt = E_net × 10^-9\n\nCurrent:\n${r.netEmissions.toFixed(2)} tCO2e × 10^-9 = ${formatGtText(r.intensityGt, 3)} Gt\n\nInterpretation:\nLower Gt value means lower reported carbon intensity.`
+      tip: `Formula:\nIntensityGt = E_net × 10^-9\n\nCurrent:\n${r.netEmissions.toFixed(2)} tCO2e × 10^-9 = ${formatGtText(r.intensityGt, 3)} Gt`
     },
     {
-      name: 'SBTi 1.5°C Delta',
-      value: sbtiLabel,
-      tip: `Formula:\nScenario Reduction - Selected Milestone Target\n\nCurrent:\n${r.scenarioReduction.toFixed(1)}% - ${r.targetPercent.toFixed(1)}% = ${r.gap.toFixed(1)} percentage points\n\nImportant rule:\nPositive value = ahead of milestone.\nNegative value = behind milestone.\nDo not interpret a positive delta as a weakness.`
+      name: 'SBTi 1.5°C Gap',
+      value: `${r.gap >= 0 ? '+' : ''}${r.gap.toFixed(1)}%`,
+      tip: `Formula:\nScenario Reduction - Selected Milestone Target\n\nCurrent:\n${r.scenarioReduction.toFixed(1)}% - ${r.targetPercent.toFixed(1)}% = ${r.gap.toFixed(1)}%\n\nMilestone: ${r.targetYear}`
     },
     {
       name: 'MJ Energy Logic',
       value: `${Math.round(r.energyRatio)}%`,
-      tip: `Formula:\nEnergy Transition Ratio = transition MJ / total MJ × 100\n\nCurrent:\n${fmt0(r.transitionEnergyMj)} / ${fmt0(r.totalEnergyMj)} × 100 = ${r.energyRatio.toFixed(1)}%\n\nIncludes solar yield, biodiesel contribution and SAF share where Jet-A1 exists.`
+      tip: `Formula:\nEnergy Transition Ratio = transition MJ / total MJ × 100\n\nCurrent:\n${fmt0(r.transitionEnergyMj)} / ${fmt0(r.totalEnergyMj)} × 100 = ${r.energyRatio.toFixed(1)}%\n\nIncludes solar yield, biodiesel and SAF share.`
     },
     {
       name: 'Segment Weighting',
@@ -1046,7 +1007,7 @@ function updateTooltips(r) {
   setTip('tipBatt', `Battery maturity delta:\n(Battery Wh/kg − ${BATT_SOA}) / ${BATT_SOA} × 100\n\nCurrent:\n(${r.batt} − ${BATT_SOA}) / ${BATT_SOA} × 100 = ${r.battDelta.toFixed(1)}%`);
   setTip('tipKpiIndex', `Readiness Index formula:\n(Escore × We) + (Sscore × Ws) + (Gscore × Wg)\n\nCurrent:\n(${r.scoreE.toFixed(1)} × ${r.weights.e}) + (${r.scoreS.toFixed(1)} × ${r.weights.s}) + (${r.scoreG.toFixed(1)} × ${r.weights.g}) = ${r.totalScore}/100`);
   setTip('tipKpiGt', `Gigatonne conversion:\nIntensityGt = E_net × 10^-9\n\nCurrent:\n${r.netEmissions.toFixed(2)} × 10^-9 = ${formatGtText(r.intensityGt)} Gt`);
-//   setTip('tipKpiGap', `SBTi delta:\nScenario reduction − selected milestone target\n\nCurrent:\n${r.scenarioReduction.toFixed(1)}% − ${r.targetPercent.toFixed(1)}% = ${r.gap.toFixed(1)}%`);
+//   setTip('tipKpiGap', `SBTi gap:\nScenario reduction − selected milestone target\n\nCurrent:\n${r.scenarioReduction.toFixed(1)}% − ${r.targetPercent.toFixed(1)}% = ${r.gap.toFixed(1)}%`);
 //   setTip('tipKpiEnergy', `MJ Energy Transition Ratio:\ntransition MJ / total MJ × 100\n\nCurrent:\n${fmt0(r.transitionEnergyMj)} / ${fmt0(r.totalEnergyMj)} × 100 = ${r.energyRatio.toFixed(1)}%`);
   setTip('tipExplainScore', `Readiness Index formula:\n(Escore × We) + (Sscore × Ws) + (Gscore × Wg)\n\nCurrent:\n(${r.scoreE.toFixed(1)} × ${r.weights.e}) + (${r.scoreS.toFixed(1)} × ${r.weights.s}) + (${r.scoreG.toFixed(1)} × ${r.weights.g}) = ${r.totalScore}/100\n\nSegment weighting: ${r.weights.label}`);
 }
@@ -1079,6 +1040,120 @@ function renderMethodology(r) {
     ['Pillar 4: Energy', 'IPCC 2006 Guidelines', 'Uses net calorific-value style MJ logic for biomass, hydrogen, Jet-A1 and solar yield.']
   ];
   $('techStack').innerHTML = stack.map(s => `<div class="stack-row"><b>${s[0]}</b><span>${s[1]}</span><span>${s[2]}</span></div>`).join('');
+}
+function getScenarioConfig(segment) {
+  const commonSolar = {
+    key: 'solar', label: 'Solar PV Scenario', unit: 'kWp', min: 0, max: 2000, step: 10,
+    value: r => r.solar,
+    format: v => `${Math.round(v)} kWp`,
+    tip: 'Tests renewable capacity expansion.\nFormula impact:\nRsolar = (kWp × 1500 / 1000) × 0.6\nThis mainly improves Environment and Gt intensity.'
+  };
+  const governance = {
+    key: 'inst', label: 'Institutional Integration Scenario', unit: 'Level', min: 0.2, max: 1, step: 0.3,
+    value: r => r.inst,
+    format: v => levelName(v).replace(': ', ' '),
+    tip: 'Tests governance maturity improvement.\nFormula impact:\nGovernance Score = Institutional Integration × 100\nThis is strongest for SYS and R&T segments.'
+  };
+  const labour = {
+    key: 'labour', label: 'Labour Disclosure Scenario', unit: '%', min: 0, max: 100, step: 5,
+    value: r => r.labour,
+    format: v => `${Math.round(v)}%`,
+    tip: 'Tests labour disclosure improvement.\nFormula impact:\nSocial Score = (Labour × 0.6) + (Hiring × 40)\nThis improves Social readiness.'
+  };
+  const hiring = {
+    key: 'hiring', label: 'Hiring Readiness Scenario', unit: 'Level', min: 0.3, max: 1, step: 0.3,
+    value: r => r.hiring,
+    format: v => Number(v) >= 1 ? 'High' : Number(v) >= 0.6 ? 'Medium' : 'Low',
+    tip: 'Tests ESG workforce readiness.\nLow=0.3, Medium=0.6, High=1.0\nHiring contributes up to 40 points in Social score.'
+  };
+  const biodiesel = {
+    key: 'bio', label: 'Biodiesel / GSE Scenario', unit: 't', min: 0, max: 200, step: 5,
+    value: r => r.bio,
+    format: v => `${Math.round(v)} t`,
+    tip: 'Tests ground support equipment fuel quantity.\nFormula impact:\nS1gse = Biodiesel(t) × 2.52\nReducing fuel quantity lowers net emissions.'
+  };
+  const saf = {
+    key: 'saf', label: 'SAF Blend Scenario', unit: '%', min: 0, max: 100, step: 5,
+    value: r => r.saf,
+    format: v => `${Math.round(v)}%`,
+    tip: 'Tests sustainable aviation fuel blend.\nFormula impact:\nS1flight = Jet-A1 × 3.15 × (1 − SAF% × 0.8)\nOnly affects results when Jet-A1 is above 0.'
+  };
+  const offset = {
+    key: 'offsetPct', label: 'Carbon Offset Scenario', unit: '% net', min: 0, max: 100, step: 5,
+    value: r => r.offsetPct,
+    format: v => `${Math.round(v)}% of net`,
+    tip: 'Tests market removals strategy.\nFormula impact:\nOffset contribution = (offset% × E_net) / (baseline × target) × 100\nThis supports CORSIA / removals narrative but does not replace direct reductions.'
+  };
+  const battery = {
+    key: 'batt', label: 'Battery Tech Scenario', unit: 'Wh/kg', min: 150, max: 600, step: 10,
+    value: r => r.batt,
+    format: v => `${Math.round(v)} Wh/kg`,
+    tip: 'Tests technology readiness.\nFormula impact:\nBattery Delta = (Wh/kg − 250) / 250 × 100\nUseful for aviation technology maturity narrative.'
+  };
+
+  const map = {
+    MRO: {
+      note: 'MRO scenario focuses on ground operations, labour disclosure and governance readiness. SAF is hidden because Jet-A1 is normally not relevant for MRO unless fuel is entered.',
+      levers: [commonSolar, biodiesel, labour]
+    },
+    MFG: {
+      note: 'Manufacturing scenario focuses on emissions-heavy operations: renewable power, SAF for testing/delivery, and technology readiness.',
+      levers: [commonSolar, saf, battery]
+    },
+    SYS: {
+      note: 'System Integration scenario balances aviation technology and governance: SAF, institutional integration and offsets.',
+      levers: [saf, governance, offset]
+    },
+    RNT: {
+      note: 'R&T / Engineering scenario focuses on capability and governance maturity, where Social and Governance weights are highest.',
+      levers: [hiring, governance, labour]
+    }
+  };
+  return map[segment] || map.MRO;
+}
+function syncScenarioFromResult(r) {
+  const config = getScenarioConfig(r.segment);
+  $('scenarioSegmentNote').textContent = config.note;
+  ['A', 'B', 'C'].forEach((slot, idx) => {
+    const lever = config.levers[idx];
+    const input = $(`scenario${slot}`);
+    $(`scenario${slot}Label`).textContent = lever.label;
+    input.min = lever.min;
+    input.max = lever.max;
+    input.step = lever.step;
+    input.value = lever.value(r);
+    $(`scenario${slot}Val`).textContent = lever.format(input.value);
+    setTip(`tipScenario${slot}`, lever.tip);
+  });
+}
+function updateScenario() {
+  if (!latest) return;
+  const config = getScenarioConfig(latest.segment);
+  const overrides = {};
+  ['A', 'B', 'C'].forEach((slot, idx) => {
+    const lever = config.levers[idx];
+    const value = Number($(`scenario${slot}`).value);
+    overrides[lever.key] = value;
+    $(`scenario${slot}Val`).textContent = lever.format(value);
+  });
+
+  const projected = calculate(collect(overrides));
+  $('scenarioScore').textContent = `${latest.totalScore} → ${projected.totalScore}`;
+  const delta = latest.netEmissions - projected.netEmissions;
+  $('scenarioEmission').textContent = `${delta >= 0 ? '-' : '+'}${Math.abs(delta).toFixed(1)} tCO2e`;
+
+  const scoreDelta = projected.totalScore - latest.totalScore;
+  if (scoreDelta > 0 && delta > 0) {
+    $('scenarioInsight').textContent = `Improves readiness by +${scoreDelta} and reduces emissions.`;
+  } else if (scoreDelta > 0) {
+    $('scenarioInsight').textContent = `Improves readiness by +${scoreDelta}; emissions are mostly unchanged.`;
+  } else if (delta > 0) {
+    $('scenarioInsight').textContent = 'Emissions improve; readiness score is capped or unchanged.';
+  } else if (latest.segment !== 'MRO' && overrides.saf && latest.fuel <= 0) {
+    $('scenarioInsight').textContent = 'SAF has no impact because Jet-A1 input is 0.';
+  } else {
+    $('scenarioInsight').textContent = 'Limited impact from this scenario.';
+  }
 }
 function snapshotForHistory(r) {
   return {
@@ -1114,346 +1189,76 @@ function renderHistory() {
 }
 
 function getReadinessNarrative(r) {
-  const pillars = [
-    { name: 'Environmental', score: r.scoreE, weight: r.weights.e },
-    { name: 'Social', score: r.scoreS, weight: r.weights.s },
-    { name: 'Governance', score: r.scoreG, weight: r.weights.g }
-  ].sort((a,b) => a.score - b.score);
-
-  const weakest = pillars[0].name;
-  const sbtiPosition = r.gap >= 0 ? 'ahead' : 'behind';
-  const sbtiSentence = r.gap >= 0
-    ? `ahead of the selected ${r.targetYear} SBTi milestone by ${Math.abs(r.gap).toFixed(1)} percentage points`
-    : `behind the selected ${r.targetYear} SBTi milestone by ${Math.abs(r.gap).toFixed(1)} percentage points`;
-
-  return { pillars, weakest, sbtiPosition, sbtiSentence };
+  const weakest = [
+    ['Environmental', r.scoreE], ['Social', r.scoreS], ['Governance', r.scoreG]
+  ].sort((a,b) => a[1] - b[1])[0][0];
+  const gapStatus = r.gap >= 0 ? 'ahead of' : 'behind';
+  return { weakest, gapStatus };
 }
-
-function hiringLabel(value) {
-  const v = Number(value);
-  if (v >= 1) return 'High';
-  if (v >= 0.6) return 'Medium';
-  return 'Low';
-}
-
-function buildTopGaps(r) {
-  const gaps = [];
-  if (r.scoreG < 75) {
-    gaps.push({
-      area: 'Governance',
-      severity: r.scoreG < 40 ? 'High' : 'Medium',
-      evidence: `${levelName(r.inst)} institutional integration; Governance score ${Math.round(r.scoreG)}/100.`,
-      recommendation: 'Formalise ESG ownership, policy controls, management review cadence and evidence retention.'
-    });
-  }
-  if (r.scoreS < 75) {
-    gaps.push({
-      area: 'Social',
-      severity: r.scoreS < 60 ? 'High' : 'Medium',
-      evidence: `${r.labour}% labour disclosure and ${hiringLabel(r.hiring)} hiring readiness; Social score ${Math.round(r.scoreS)}/100.`,
-      recommendation: 'Strengthen labour disclosure, ESG training records, hiring competency evidence and workforce transition planning.'
-    });
-  }
-  if (r.scoreE < 75) {
-    gaps.push({
-      area: 'Environment',
-      severity: r.scoreE < 60 ? 'High' : 'Medium',
-      evidence: `Environmental score ${Math.round(r.scoreE)}/100; net emissions ${r.netEmissions.toFixed(1)} tCO2e.`,
-      recommendation: 'Prioritise direct abatement through energy efficiency, solar PV, SAF where relevant and fuel transition measures.'
-    });
-  }
-  if (r.gap < 0) {
-    gaps.push({
-      area: 'SBTi milestone position',
-      severity: 'High',
-      evidence: `Behind ${r.targetYear} milestone by ${Math.abs(r.gap).toFixed(1)} percentage points.`,
-      recommendation: 'Increase direct emissions reduction before relying on offsets.'
-    });
-  }
-  if (r.energyRatio < 25) {
-    gaps.push({
-      area: 'MJ energy transition',
-      severity: 'Medium',
-      evidence: `Energy transition ratio ${r.energyRatio.toFixed(1)}%; transition MJ ${fmt0(r.transitionEnergyMj)} versus total MJ ${fmt0(r.totalEnergyMj)}.`,
-      recommendation: 'Improve renewable and transition-energy contribution through solar yield, bioenergy, hydrogen or efficiency pathways.'
-    });
-  }
-
-  return gaps.slice(0, 4);
-}
-
 function buildAiPayload(r) {
-  const { pillars, weakest, sbtiPosition, sbtiSentence } = getReadinessNarrative(r);
-  const gaps = buildTopGaps(r);
-
   return {
-    meta: {
-      toolName: 'NAICO ESG Aerospace Validator 2026',
-      purpose: 'Aerospace SME ESG readiness assessment and decision intelligence',
-      aiRole: 'Aerospace ESG Transformation Advisor'
-    },
-    strictInterpretationRules: [
-      'Never describe a positive SBTi delta as a weakness, gap, shortfall, lag, or insufficient decarbonisation. Positive sbtiDeltaPercent means the scenario is ahead of the selected milestone.',
-      'Negative sbtiDeltaPercent means the scenario is behind the selected milestone and should be treated as a transition gap.',
-      'The deterministic formulas are the source of truth. Do not recalculate, override, invent, average, or reinterpret scores, emission factors, coefficients or target percentages.',
-      'Separate operational performance from governance readiness. A strong environmental score can coexist with weak governance; do not force all pillars into the same conclusion.',
-      'Use detectedGaps and weakestPillar as the primary source for recommendations.',
-      'Do not recommend offsets as the first action when direct abatement, governance, disclosure or evidence-control improvements are more important.',
-      'Recommendations must reference the weakest E/S/G pillars and the selected aerospace segment.',
-      'Keep recommendations practical for aerospace SMEs, not generic ESG advice.',
-      'If the payload contains displayedResultSummary, your summary must be consistent with it.'
-    ],
     organisation: r.orgName,
     segment: r.weights.label,
     milestoneYear: r.targetYear,
-    readiness: {
-      index: r.totalScore,
-      maturity: maturity(r.totalScore),
-      pillarScores: {
-        environmental: Number(r.scoreE.toFixed(1)),
-        social: Number(r.scoreS.toFixed(1)),
-        governance: Number(r.scoreG.toFixed(1))
-      },
-      weakestPillar: weakest,
-      weightedContributions: {
-        environmental: Number((r.scoreE * r.weights.e).toFixed(1)),
-        social: Number((r.scoreS * r.weights.s).toFixed(1)),
-        governance: Number((r.scoreG * r.weights.g).toFixed(1))
-      },
-      segmentWeights: {
-        environmental: r.weights.e,
-        social: r.weights.s,
-        governance: r.weights.g
-      }
-    },
-    emissions: {
-      netEmissionsTco2e: Number(r.netEmissions.toFixed(2)),
-      carbonIntensityGt: formatGtText(r.intensityGt, 3),
-      scope2Tco2e: Number(r.scope2.toFixed(2)),
-      scope1GseTco2e: Number(r.scope1Gse.toFixed(2)),
-      scope1FlightTco2e: Number(r.scope1Flight.toFixed(2)),
-      scope1H2Tco2e: Number(r.scope1H2.toFixed(2)),
-      solarReductionTco2e: Number(r.solarReduction.toFixed(2))
-    },
-    sbtiMilestone: {
-      scenarioReductionPercent: Number(r.scenarioReduction.toFixed(1)),
-      targetPercent: r.targetPercent,
-      sbtiDeltaPercent: Number(r.gap.toFixed(1)),
-      position: sbtiPosition,
-      interpretation: sbtiSentence
-    },
-    energy: {
-      energyTransitionRatioPercent: Number(r.energyRatio.toFixed(1)),
-      totalEnergyMj: Math.round(r.totalEnergyMj),
-      transitionEnergyMj: Math.round(r.transitionEnergyMj),
-      solarMj: Math.round(r.solarMj),
-      biodieselMj: Math.round(r.biodieselMj),
-      jetMj: Math.round(r.jetMj),
-      hydrogenMj: Math.round(r.hydrogenMj)
-    },
-    socialGovernance: {
-      institutionalIntegration: levelName(r.inst),
-      institutionalIntegrationMultiplier: r.inst,
-      labourDisclosurePercent: r.labour,
-      hiringReadiness: hiringLabel(r.hiring),
-      hiringReadinessMultiplier: r.hiring
-    },
-    offsetsAndTech: {
-      carbonOffsetsPercentOfNet: r.offsetPct,
-      carbonOffsetContributionPercent: Number(r.offsetContribution.toFixed(1)),
-      batteryWhKg: r.batt,
-      batteryMaturityDeltaPercent: Number(r.battDelta.toFixed(1))
-    },
-    detectedGaps: gaps,
-    policyContext: {
-      miti: 'MITI i-ESG Phase 1: first-report readiness, ESG disclosure, governance integration and capacity building.',
-      nimp2030: 'NIMP2030 Mission 3: Push for Net Zero through industrial decarbonisation and sustainable manufacturing.',
-      netr: 'NETR: energy efficiency, renewable energy, hydrogen, bioenergy and energy transition levers.',
-      netZero2050: 'National Net-Zero 2050: long-term transition pathway and direct abatement priority.'
-    },
-    calculationConfidence: {
-      scoreIsDeterministic: true,
-      aiMustNotRecalculate: true,
-      sbtiPositiveMeansAhead: true,
-      sbtiNegativeMeansBehind: true,
-      noNewEmissionFactorsAllowed: true,
-      noNewPolicyClaimsAllowed: true
-    },
-    displayedResultSummary: {
-      headline: `${maturity(r.totalScore)} readiness (${r.totalScore}/100), ${sbtiPosition} selected ${r.targetYear} SBTi milestone, weakest pillar: ${weakest}`,
-      primaryStrength: r.scoreE >= Math.max(r.scoreS, r.scoreG) ? 'Environmental performance' : r.scoreS >= r.scoreG ? 'Social readiness' : 'Governance readiness',
-      primaryConstraint: weakest,
-      sbtiInterpretation: sbtiSentence,
-      aiNarrativeConstraint: r.gap >= 0
-        ? 'SBTi delta is positive and must be described as ahead of milestone, not as a gap.'
-        : 'SBTi delta is negative and should be described as behind milestone.'
-    },
-    outputQualityChecklist: [
-      'Must state the correct maturity level and readiness index.',
-      'Must identify the weakest pillar from readiness.weakestPillar.',
-      'Must correctly interpret sbtiMilestone.position.',
-      'Must give aerospace SME actions, not generic ESG slogans.',
-      'Must include policy alignment without implying official certification.'
-    ],
-    requiredOutput: {
-      executiveSummary: '2 to 4 concise sentences. Must correctly interpret SBTi position.',
-      topGaps: '3 to 4 items based on detectedGaps. Do not include SBTi as a gap if position is ahead.',
-      roadmap: '3 phases: 0-6 months, 6-12 months, 12-24 months.',
-      policyAlignment: '4 concise bullets covering MITI i-ESG, NIMP2030, NETR and Net-Zero 2050.',
-      strategicInterpretation: 'Explain why the score matters and what limits readiness.'
-    }
+    readinessIndex: r.totalScore,
+    maturity: maturity(r.totalScore),
+    environmentalScore: Math.round(r.scoreE),
+    socialScore: Math.round(r.scoreS),
+    governanceScore: Math.round(r.scoreG),
+    netEmissionsTco2e: Number(r.netEmissions.toFixed(2)),
+    carbonIntensityGt: formatGtText(r.intensityGt, 3),
+    scenarioReductionPercent: Number(r.scenarioReduction.toFixed(1)),
+    sbtiTargetPercent: r.targetPercent,
+    sbtiGapPercent: Number(r.gap.toFixed(1)),
+    energyTransitionRatioPercent: Number(r.energyRatio.toFixed(1)),
+    institutionalIntegration: levelName(r.inst),
+    labourDisclosurePercent: r.labour,
+    hiringReadinessMultiplier: r.hiring,
+    carbonOffsetContributionPercent: Number(r.offsetContribution.toFixed(1)),
+    policyContext: ['MITI i-ESG Phase 1', 'NIMP2030 Mission 3', 'NETR', 'National Net-Zero 2050']
   };
 }
-
 function localAiAdvisor(r) {
-  const { weakest, sbtiSentence } = getReadinessNarrative(r);
-  const gaps = buildTopGaps(r);
-  const isAhead = r.gap >= 0;
-  const gapText = isAhead
-    ? `The emissions pathway is ${sbtiSentence}; therefore SBTi position is a strength, not a gap.`
-    : `The emissions pathway is ${sbtiSentence}; direct abatement should be prioritised.`;
-
-  const roadmap = [];
-  if (r.scoreG < 75) {
-    roadmap.push({
-      phase: '0–6 months',
-      action: `Governance uplift: move beyond ${levelName(r.inst)} by assigning ESG ownership, creating policy controls, setting a review cadence and documenting evidence for audit.`
-    });
-  }
-  if (r.scoreS < 75) {
-    roadmap.push({
-      phase: roadmap.length ? '6–12 months' : '0–6 months',
-      action: `Social readiness: improve labour disclosure from ${r.labour}% toward 95–100%, strengthen ESG hiring readiness from ${hiringLabel(r.hiring)}, and retain training evidence.`
-    });
-  }
-  if (r.scoreE < 75 || r.energyRatio < 25 || r.gap < 0) {
-    roadmap.push({
-      phase: roadmap.length ? '12–24 months' : '6–12 months',
-      action: `Transition execution: improve direct abatement through solar PV, energy efficiency and relevant fuel transition actions while tracking Gt and MJ indicators.`
-    });
-  }
-  if (roadmap.length < 3) {
-    roadmap.push({
-      phase: roadmap.length === 0 ? '0–6 months' : roadmap.length === 1 ? '6–12 months' : '12–24 months',
-      action: 'Institutionalise the current performance by turning the assessment into a recurring audit cycle, with evidence logs, target ownership and quarterly progress reviews.'
-    });
-  }
-  if (roadmap.length < 3) {
-    roadmap.push({
-      phase: '12–24 months',
-      action: 'Prepare for external validation by aligning disclosures, energy transition actions and governance evidence with supply-chain expectations.'
-    });
-  }
-
+  const { weakest, gapStatus } = getReadinessNarrative(r);
+  const recs = getRecommendations(r);
   return {
-    executiveSummary: `${r.orgName} is rated ${maturity(r.totalScore)} with a Readiness Index of ${r.totalScore}/100 for the ${r.weights.label} segment. ${gapText} The main readiness constraint is ${weakest}, with Environmental ${Math.round(r.scoreE)}/100, Social ${Math.round(r.scoreS)}/100 and Governance ${Math.round(r.scoreG)}/100. The priority is to convert the strongest operational metrics into auditable governance, disclosure and transition-management evidence.`,
-    topGaps: gaps.length ? gaps.map(g => `${g.area}: ${g.evidence} Recommended action: ${g.recommendation}`) : [
-      'No critical E/S/G gap detected from the current thresholds; maintain audit evidence and repeat assessment over time.',
-      `${gapText}`,
-      'Continue linking actions to MITI i-ESG, NIMP2030, NETR and Net-Zero 2050.'
+    executiveSummary: `${r.orgName} is currently rated ${maturity(r.totalScore)} with a Readiness Index of ${r.totalScore}/100 for the ${r.weights.label} segment. The assessment is ${gapStatus} the selected ${r.targetYear} SBTi milestone by ${Math.abs(r.gap).toFixed(1)} percentage points. The weakest pillar is ${weakest}, so the highest-value next step is to focus on the roadmap priority actions rather than adding more data entry.`,
+    topGaps: [
+      `Weakest ESG pillar: ${weakest}.`,
+      `Governance maturity: ${levelName(r.inst)} with ${Math.round(r.scoreG)}/100 governance score.`,
+      `Energy transition ratio: ${Math.round(r.energyRatio)}%, based on MJ transition contribution versus total energy demand.`
     ],
-    roadmap: roadmap.slice(0, 3),
+    roadmap: recs.slice(0,3).map((rec, i) => ({
+      phase: i === 0 ? '0–3 months' : i === 1 ? '3–9 months' : '9–18 months',
+      action: `${rec.title}: ${rec.action}`
+    })),
     policyAlignment: [
-      `MITI i-ESG Phase 1: strengthen disclosure readiness, institutional ESG ownership and evidence quality, especially where ${weakest} limits the score.`,
-      'NIMP2030 Mission 3: support industrial decarbonisation by linking operational improvements to higher-value sustainable manufacturing and aerospace supply-chain readiness.',
-      `NETR: use the MJ Energy Ratio (${r.energyRatio.toFixed(1)}%) to frame renewable energy, bioenergy, hydrogen and efficiency actions as transition levers.`,
-      `${r.targetYear}/Net-Zero pathway: ${isAhead ? 'current emissions reduction is ahead of the selected milestone, so the next focus is governance and repeatable transition management.' : 'current emissions reduction is behind the selected milestone, so direct abatement must be accelerated.'}`
+      'MITI i-ESG Phase 1: supports first-report readiness, disclosure maturity and governance integration.',
+      'NIMP2030 Mission 3: supports industrial decarbonisation and ESG adoption for aerospace SMEs.',
+      'NETR: links solar, bioenergy, hydrogen and energy efficiency actions to Malaysia energy transition levers.',
+      'Net Zero 2050: uses 2030/2035/2040/2050 milestone comparison to show transition readiness.'
     ],
-    judgeExplanation: `Strategically, the deterministic calculator provides the auditable base, while the AI layer explains what the numbers mean. The most important interpretation is that SBTi delta is directional: ${r.gap >= 0 ? 'positive means ahead of target' : 'negative means behind target'}. The final score is limited by the weakest weighted pillars, not by emissions alone.`
+    judgeExplanation: 'The AI layer interprets deterministic ESG calculations instead of replacing them. Formulas remain auditable through tooltips, while the advisor translates outputs into industrial actions, roadmap phases and policy alignment.'
   };
 }
-
-function escapeHtml(text) {
-  return String(text ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function normaliseAiResult(data) {
-  const fallback = localAiAdvisor(latest);
-  const result = data && typeof data === 'object' ? data : {};
-  return {
-    executiveSummary: result.executiveSummary || fallback.executiveSummary,
-    topGaps: Array.isArray(result.topGaps) && result.topGaps.length ? result.topGaps : fallback.topGaps,
-    roadmap: Array.isArray(result.roadmap) && result.roadmap.length ? result.roadmap : fallback.roadmap,
-    policyAlignment: Array.isArray(result.policyAlignment) && result.policyAlignment.length ? result.policyAlignment : fallback.policyAlignment,
-    judgeExplanation: result.strategicInterpretation || result.judgeExplanation || fallback.judgeExplanation
-  };
-}
-
-function detectAiContradictions(data, r) {
-  const text = JSON.stringify(data || {}).toLowerCase();
-  const issues = [];
-  if (!r) return issues;
-
-  if (r.gap >= 0) {
-    const risky = [
-      'sbti gap', 'behind the selected', 'behind milestone', 'behind the milestone',
-      'insufficient decarbonisation', 'insufficient decarbonization',
-      'decarbonisation gap', 'decarbonization gap', 'below the milestone',
-      'not aligned with the selected milestone', 'shortfall against sbti'
-    ];
-    risky.forEach(p => { if (text.includes(p)) issues.push(`Positive SBTi delta contradicted by phrase: ${p}`); });
-  }
-
-  const expectedIndex = String(r.totalScore);
-  if (data && data.executiveSummary && !String(data.executiveSummary).includes(expectedIndex)) {
-    issues.push('Executive summary does not mention the deterministic readiness index.');
-  }
-  return issues;
-}
-
-function repairAiResult(data, r) {
-  const repaired = normaliseAiResult(data);
-  const issues = detectAiContradictions(repaired, r);
-  if (!issues.length) return repaired;
-
-  const { weakest, sbtiSentence } = getReadinessNarrative(r);
-  const safeFallback = localAiAdvisor(r);
-
-  repaired.executiveSummary = `${r.orgName} is rated ${maturity(r.totalScore)} with a Readiness Index of ${r.totalScore}/100. ${sbtiSentence} The main readiness constraint is ${weakest}, so recommendations should focus on the weakest E/S/G pillar rather than contradicting the SBTi position.`;
-  repaired.topGaps = safeFallback.topGaps;
-  repaired.roadmap = safeFallback.roadmap;
-  repaired.policyAlignment = safeFallback.policyAlignment;
-  repaired.judgeExplanation = `AI consistency guard applied: ${issues.join('; ')}. ${safeFallback.judgeExplanation}`;
-  return repaired;
-}
-
-function renderAiResult(rawData, mode = 'AI') {
-  const data = repairAiResult(rawData, latest);
+function renderAiResult(data, mode = 'AI') {
   const roadmap = Array.isArray(data.roadmap) ? data.roadmap : [];
   const gaps = Array.isArray(data.topGaps) ? data.topGaps : [];
   const policies = Array.isArray(data.policyAlignment) ? data.policyAlignment : [];
   $('aiOutput').innerHTML = `
-    <div class="ai-section"><h3>Executive Summary</h3><p>${escapeHtml(data.executiveSummary)}</p></div>
-    <div class="ai-section"><h3>Top ESG Gaps</h3><ul>${gaps.map(g=>`<li>${escapeHtml(g)}</li>`).join('')}</ul></div>
-    <div class="ai-section"><h3>AI Transition Roadmap</h3><div class="ai-roadmap">${roadmap.map(r=>`<div class="ai-phase"><b>${escapeHtml(r.phase || 'Phase')}</b><p>${escapeHtml(r.action || r)}</p></div>`).join('')}</div></div>
-    <div class="ai-section"><h3>Policy Alignment</h3><ul>${policies.map(p=>`<li>${escapeHtml(p)}</li>`).join('')}</ul></div>
-    <div class="ai-section"><h3>Strategic Interpretation</h3><p>${escapeHtml(data.judgeExplanation)}</p></div>
+    <div class="ai-section"><h3>Executive Summary</h3><p>${data.executiveSummary || 'No summary returned.'}</p></div>
+    <div class="ai-section"><h3>Top ESG Gaps</h3><ul>${gaps.map(g=>`<li>${g}</li>`).join('')}</ul></div>
+    <div class="ai-section"><h3>AI Transition Roadmap</h3><div class="ai-roadmap">${roadmap.map(r=>`<div class="ai-phase"><b>${r.phase || 'Phase'}</b><p>${r.action || r}</p></div>`).join('')}</div></div>
+    <div class="ai-section"><h3>Policy Alignment</h3><ul>${policies.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+    <div class="ai-section"><h3>Judge Explanation</h3><p>${data.judgeExplanation || 'The AI advisor converts auditable ESG calculations into decision intelligence.'}</p></div>
   `;
   $('aiStatus').textContent = `${mode} insights generated for ${latest.orgName}.`;
 }
-
-function updateAiEvidence(r) {
-  const el = $('aiEvidence');
-  if (!el || !r) return;
-  const { weakest, sbtiSentence } = getReadinessNarrative(r);
-  el.innerHTML = `
-    <span>Source of truth: <b>Deterministic formulas</b></span>
-    <span>AI role: <b>Interpretation only</b></span>
-    <span>SBTi: <b>${escapeHtml(sbtiSentence)}</b></span>
-    <span>Primary constraint: <b>${escapeHtml(weakest)}</b></span>
-  `;
-}
-
 async function generateAiInsights() {
   if (!latest) return alertMsg('Generate assessment first.');
   const endpoint = ($('aiEndpoint') && $('aiEndpoint').value.trim()) || '';
   const payload = buildAiPayload(latest);
-  $('aiStatus').textContent = endpoint ? 'Calling AI advisor endpoint with precision payload and contradiction guard...' : 'No endpoint provided; generating deterministic local preview.';
+  $('aiStatus').textContent = endpoint ? 'Calling AI advisor endpoint...' : 'No endpoint provided; generating local AI-ready preview.';
   $('btnAiInsights').disabled = true;
   try {
     if (endpoint) {
@@ -1469,13 +1274,12 @@ async function generateAiInsights() {
       renderAiResult(localAiAdvisor(latest), 'Local preview');
     }
   } catch (err) {
-    $('aiStatus').textContent = `AI endpoint failed: ${err.message}. Showing deterministic local advisor instead.`;
+    $('aiStatus').textContent = `AI endpoint failed: ${err.message}. Showing local preview instead.`;
     renderAiResult(localAiAdvisor(latest), 'Local preview');
   } finally {
     $('btnAiInsights').disabled = false;
   }
 }
-
 function copyAiSummary() {
   const text = $('aiOutput') ? $('aiOutput').innerText.trim() : '';
   if (!text) return alertMsg('No AI summary to copy.');
@@ -1493,43 +1297,24 @@ function exportJson() {
 }
 function resetBaseline() {
   $('targetYear').value = '2030'; $('seg').value = 'MRO'; $('fuel').value = 0; $('elec').value = 1200; $('biodiesel').value = 50; $('solar').value = 200; $('h2').value = 0; $('saf').value = 0; $('instInt').value = 0.2; $('hiringReady').value = 0.3; $('labour').value = 80; $('offsetPct').value = 10; $('batt').value = 250;
-  updateFlightSection({ resetConditional: true });
+  updateFlightSection();
   render(calculate(collect()));
   alertMsg('Baseline reset.');
 }
-function updateFlightSection({ resetConditional = false } = {}) {
+function updateFlightSection() {
   const seg = $('seg').value;
-  const flightEnabled = isFlightSegment(seg);
-  $('flightFuelSection').style.display = flightEnabled ? 'block' : 'none';
-
-  // Prevent stale hidden Jet-A1/SAF values from leaking into new segment results.
-  // When segment changes, reset conditional aviation-fuel inputs to defaults.
-  if (resetConditional || !flightEnabled) {
-    $('fuel').value = 0;
-    $('saf').value = 0;
-    $('safVal').textContent = '0%';
-  }
+  $('flightFuelSection').style.display = (seg === 'MFG' || seg === 'SYS') ? 'block' : 'none';
 }
-function refreshAssessment() {
-  updateFlightSection();
-  render(calculate(collect()));
-}
-$('seg').addEventListener('change', () => {
-  updateFlightSection({ resetConditional: true });
-  render(calculate(collect()));
-  alertMsg('Segment changed. Conditional Jet-A1/SAF inputs were reset to prevent hidden-value carryover.');
-});
-['targetYear','fuel','elec','biodiesel','solar','h2','saf','instInt','hiringReady','labour','offsetPct','batt'].forEach(id => {
-  $(id).addEventListener('input', refreshAssessment);
-  $(id).addEventListener('change', refreshAssessment);
+['targetYear','seg','fuel','elec','biodiesel','solar','h2','saf','instInt','hiringReady','labour','offsetPct','batt'].forEach(id => {
+  $(id).addEventListener('input', () => { updateFlightSection(); render(calculate(collect())); });
+  $(id).addEventListener('change', () => { updateFlightSection(); render(calculate(collect())); });
 });
 $('assessmentForm').addEventListener('submit', e => { e.preventDefault(); render(calculate(collect()), true); alertMsg('i-ESG report generated and saved to audit history.'); });
 $('btnReset').addEventListener('click', resetBaseline);
 if ($('clearHistory')) $('clearHistory').addEventListener('click', () => { localStorage.removeItem('naico-esg-history-v21'); renderHistory(); alertMsg('Audit history cleared.'); });
-if ($('heroPrint')) $('heroPrint').addEventListener('click', () => {
-  alertMsg('For the cleanest PDF: enable Background graphics and turn off browser Headers and footers in the print dialog.');
-  setTimeout(() => window.print(), 250);
-});
+$('heroGenerate').addEventListener('click', () => { render(calculate(collect()), true); document.querySelector('.main-grid').scrollIntoView({ behavior: 'smooth' }); });
+$('heroPrint').addEventListener('click', () => window.print());
+$('heroJson').addEventListener('click', exportJson);
 if ($('btnAiInsights')) $('btnAiInsights').addEventListener('click', generateAiInsights);
 if ($('btnCopyAi')) $('btnCopyAi').addEventListener('click', copyAiSummary);
 document.addEventListener('click', (event) => {
