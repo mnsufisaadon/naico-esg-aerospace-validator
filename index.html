@@ -756,6 +756,9 @@
             <div class="divider"></div>
             <button class="btn btn-primary btn-full" type="submit">Generate i-ESG Report</button>
             <button class="btn btn-outline btn-full" id="btnReset" type="button" style="margin-top:10px;">Reset Baseline Inputs</button>
+            <div id="reportStatus" class="hint" style="margin-top:10px;padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:var(--primary-soft-2);font-weight:800;">
+              Ready. Click Generate i-ESG Report to calculate and update the dashboard.
+            </div>
           </form>
         </div>
       </aside>
@@ -887,6 +890,8 @@ const AI_API_ENDPOINT = (window.NAICO_ESG_AI_ENDPOINT || 'https://naico-esg-ai-a
 const $ = id => document.getElementById(id);
 const num = id => parseFloat($(id).value) || 0;
 let latest = null;
+let inputDirty = false;
+let reportGenerated = false;
 function setTip(id, text) { const el = $(id); if (el) el.setAttribute('data-tip', text); }
 function formatGtHTML(value, sig = 2) {
   const exp = value.toExponential(sig).split('e');
@@ -906,6 +911,31 @@ function alertMsg(msg) {
   el.textContent = msg;
   el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 2600);
+}
+
+function setReportStatus(message, mode = 'info') {
+  const el = $('reportStatus');
+  if (!el) return;
+  el.textContent = message;
+  el.style.display = 'block';
+  el.style.borderStyle = mode === 'success' ? 'solid' : 'dashed';
+  el.style.background = mode === 'success' ? '#ECFDF5' : 'var(--primary-soft-2)';
+  el.style.color = mode === 'success' ? '#166534' : 'var(--primary-dark)';
+}
+
+function updateLiveInputLabels() {
+  if ($('safVal')) $('safVal').textContent = `${Math.round(num('saf'))}%`;
+  if ($('labVal')) $('labVal').textContent = `${Math.round(num('labour'))}%`;
+}
+
+function markInputsChanged(message = 'Inputs changed. Click Generate i-ESG Report to refresh the dashboard.') {
+  inputDirty = true;
+  updateLiveInputLabels();
+  setReportStatus(message, 'warning');
+
+  if (reportGenerated && $('aiStatus')) {
+    $('aiStatus').textContent = 'Inputs changed. Generate a new i-ESG report before requesting AI insights.';
+  }
 }
 
 function showLoading(title = 'Generating...', message = 'Please wait while the validator prepares the result.', pill = 'Deterministic calculator + AI interpretation') {
@@ -1936,7 +1966,12 @@ function updateAiEvidence(r) {
 }
 
 async function generateAiInsights() {
-  if (!latest) return alertMsg('Generate assessment first.');
+  if (!latest || !reportGenerated) {
+    return alertMsg('Click Generate i-ESG Report first.');
+  }
+  if (inputDirty) {
+    return alertMsg('Inputs changed. Click Generate i-ESG Report again before AI insights.');
+  }
   const endpoint = AI_API_ENDPOINT;
   const payload = buildAiPayload(latest);
   const liveMode = Boolean(endpoint);
@@ -2004,10 +2039,22 @@ function exportJson() {
   URL.revokeObjectURL(a.href);
 }
 function resetBaseline() {
-  $('targetYear').value = '2030'; $('seg').value = 'MRO'; $('fuel').value = 0; $('elec').value = 1200; $('biodiesel').value = 50; $('solar').value = 200; $('h2').value = 0; $('saf').value = 0; $('instInt').value = 0.2; $('hiringReady').value = 0.3; $('labour').value = 80; $('offsetPct').value = 10; $('batt').value = 250;
+  $('targetYear').value = '2030';
+  $('seg').value = 'MRO';
+  $('fuel').value = 0;
+  $('elec').value = 1200;
+  $('biodiesel').value = 50;
+  $('solar').value = 200;
+  $('h2').value = 0;
+  $('saf').value = 0;
+  $('instInt').value = 0.2;
+  $('hiringReady').value = 0.3;
+  $('labour').value = 80;
+  $('offsetPct').value = 10;
+  $('batt').value = 250;
   updateFlightSection({ resetConditional: true });
-  render(calculate(collect()));
-  alertMsg('Baseline reset.');
+  markInputsChanged('Baseline inputs restored. Click Generate i-ESG Report to refresh the dashboard.');
+  alertMsg('Baseline reset. Click Generate i-ESG Report to refresh.');
 }
 function updateFlightSection({ resetConditional = false } = {}) {
   const seg = $('seg').value;
@@ -2024,7 +2071,7 @@ function updateFlightSection({ resetConditional = false } = {}) {
 }
 function refreshAssessment() {
   updateFlightSection();
-  render(calculate(collect()));
+  markInputsChanged();
 }
 function isEmbedded() {
   try {
@@ -2054,7 +2101,7 @@ function setupExportButton() {
 }
 $('seg').addEventListener('change', () => {
   updateFlightSection({ resetConditional: true });
-  render(calculate(collect()));
+  markInputsChanged('Segment changed. Click Generate i-ESG Report to refresh the dashboard.');
   alertMsg('Segment changed. Conditional Jet-A1/SAF inputs were reset to prevent hidden-value carryover.');
 });
 ['targetYear','fuel','elec','biodiesel','solar','h2','saf','instInt','hiringReady','labour','offsetPct','batt'].forEach(id => {
@@ -2069,15 +2116,21 @@ $('assessmentForm').addEventListener('submit', async e => {
     'Deterministic formula engine'
   );
   await wait(350);
-  render(calculate(collect()), true);
+  const assessment = calculate(collect());
+  render(assessment, true);
+  inputDirty = false;
+  reportGenerated = true;
+  setReportStatus('Report generated successfully. Dashboard, validation, trend and AI payload now reflect the latest inputs.', 'success');
   hideLoading();
   alertMsg('i-ESG report generated and saved to audit history.');
 });
 $('orgName').addEventListener('input', () => {
   renderHistory();
+  markInputsChanged('Organisation name changed. Click Generate i-ESG Report to save a new snapshot for this SME.');
 });
 $('orgName').addEventListener('change', () => {
   renderHistory();
+  markInputsChanged('Organisation name changed. Click Generate i-ESG Report to save a new snapshot for this SME.');
 });
 $('btnReset').addEventListener('click', resetBaseline);
 if ($('clearHistory')) $('clearHistory').addEventListener('click', () => {
@@ -2098,7 +2151,12 @@ document.addEventListener('click', (event) => {
     event.target.classList.toggle('show-tip');
   }
 });
-window.addEventListener('load', () => { updateFlightSection(); renderHistory(); render(calculate(collect())); });
+window.addEventListener('load', () => {
+  updateFlightSection();
+  updateLiveInputLabels();
+  renderHistory();
+  setReportStatus('Ready. Click Generate i-ESG Report to calculate and update the dashboard.', 'info');
+});
 </script>
 </body>
 </html>
